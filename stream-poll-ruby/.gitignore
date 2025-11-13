@@ -1,0 +1,25 @@
+# Dependencies
+vendor/
+.bundle/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Ruby version manager
+.ruby-version
+.ruby-gemset
+

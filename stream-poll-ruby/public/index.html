@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaunchDarkly Streaming vs Polling Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-value {
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .status-value.streaming {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-value.polling {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-value.initialized {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-value.not-initialized {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .toggle-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .toggle-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .toggle-button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LaunchDarkly Update Mode</h1>
+        <p class="subtitle">Dynamically switch between streaming and polling</p>
+
+        <div class="status-card">
+            <div class="status-row">
+                <span class="status-label">Current Mode:</span>
+                <span class="status-value" id="currentMode">Loading...</span>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Client Status:</span>
+                <span class="status-value" id="clientStatus">Loading...</span>
+            </div>
+        </div>
+
+        <button class="toggle-button" id="toggleButton" onclick="toggleMode()">
+            Switch to Polling Mode
+        </button>
+
+        <div class="error" id="errorMessage"></div>
+
+        <div class="info-box">
+            <h3>About Update Modes</h3>
+            <p>
+                <strong>Streaming:</strong> Real-time updates via WebSocket connection. 
+                Changes are pushed immediately when flags are updated in LaunchDarkly.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Polling:</strong> Periodic checks for flag updates. 
+                The client checks for changes at regular intervals (default: 5 seconds).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'streaming';
+
+        // Fetch current status
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                currentMode = data.updateMode;
+                updateUI(data);
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                showError('Failed to fetch status. Please check the server connection.');
+            }
+        }
+
+        // Update UI based on status
+        function updateUI(data) {
+            const modeElement = document.getElementById('currentMode');
+            const statusElement = document.getElementById('clientStatus');
+            const toggleButton = document.getElementById('toggleButton');
+
+            // Update mode display
+            modeElement.textContent = data.updateMode;
+            modeElement.className = `status-value ${data.updateMode}`;
+
+            // Update client status
+            if (data.isInitialized) {
+                statusElement.textContent = 'Initialized';
+                statusElement.className = 'status-value initialized';
+                toggleButton.disabled = false;
+            } else {
+                statusElement.textContent = 'Not Initialized';
+                statusElement.className = 'status-value not-initialized';
+                toggleButton.disabled = true;
+            }
+
+            // Update button text
+            const newMode = data.updateMode === 'streaming' ? 'polling' : 'streaming';
+            toggleButton.textContent = `Switch to ${newMode.charAt(0).toUpperCase() + newMode.slice(1)} Mode`;
+        }
+
+        // Toggle between streaming and polling
+        async function toggleMode() {
+            const toggleButton = document.getElementById('toggleButton');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Disable button and show loading
+            toggleButton.disabled = true;
+            const originalText = toggleButton.textContent;
+            toggleButton.innerHTML = 'Switching...<span class="loading"></span>';
+            errorMessage.classList.remove('show');
+
+            try {
+                const response = await fetch('/api/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update status after successful toggle
+                    setTimeout(() => {
+                        fetchStatus();
+                    }, 1000);
+                } else {
+                    throw new Error(data.error || 'Failed to toggle mode');
+                }
+            } catch (error) {
+                console.error('Error toggling mode:', error);
+                showError(error.message || 'Failed to toggle update mode. Please try again.');
+                toggleButton.disabled = false;
+                toggleButton.textContent = originalText;
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            // Hide error after 5 seconds
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // Fetch status on page load
+        fetchStatus();
+
+        // Poll for status updates every 2 seconds
+        setInterval(fetchStatus, 2000);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,34 @@
+[
+  {
+    "key": "randy-cane",
+    "name": "Randy"
+  },
+  {
+    "kind": "user",
+    "key": "sandy-key",
+    "name": "Sandy"
+  },
+  {
+    "key": "bobby-key",
+    "name": "Bob Johnson"
+  },
+  {
+    "kind": "user",
+    "key": "alice-key",
+    "name": "Alice Brown"
+  },
+  {
+    "kind": "multi",
+    "user": {
+      "key": "kevin-key",
+      "name": "Kevin",
+      "email": "kevin@homemc.com",
+      "jobFunction": "Verdugo"
+    },
+    "office": {
+      "key": "the-place-to-be-bur",
+      "name": "The Place To Be",
+      "location": "Burbank"
+    }
+  }
+] 
