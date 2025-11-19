@@ -32,7 +32,7 @@ For a sample application demonstrating how to use LaunchDarkly in _client-side_ 
    ```
    LAUNCHDARKLY_SDK_KEY=your-sdk-key-here
    LAUNCHDARKLY_FLAG_KEY=my-flag
-   PORT=3000
+   PORT=3005
    ```
 
 3. (Optional) Set the feature flag key you want to evaluate:
@@ -45,14 +45,14 @@ For a sample application demonstrating how to use LaunchDarkly in _client-side_ 
    const featureFlagKey = 'my-flag';
    ```
 
-4. (Optional) Set the server port (defaults to 3000):
+4. (Optional) Set the server port (defaults to 3005):
    ```bash
-   export PORT=3000
+   export PORT=3005
    ```
    
    Or add to your `.env` file:
    ```
-   PORT=3000
+   PORT=3005
    ```
 
 5. Build the TypeScript code:
