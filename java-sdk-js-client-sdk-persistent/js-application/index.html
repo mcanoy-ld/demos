@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/launchdarkly-js-client-sdk@3"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>LaunchDarkly Bootstrap Demo</h1>
+      
+      <div class="content-grid">
+        <div class="box">
+          <h2>LaunchDarkly Bootstrapped from API</h2>
+          <div id="bootstrapJson" class="json-display">Loading bootstrap data...</div>
+        </div>
+        
+        <div class="box">
+          <h2>Widget Flag</h2>
+          <div class="widget-indicator">
+            <div id="widgetCircle" class="widget-circle off">OFF</div>
+            <div class="widget-label">widget-one: <span id="widgetValue">false</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const BOOTSTRAP_API_URL = 'http://localhost:8080/api/bootstrap';
+      const CLIENT_SIDE_ID = 'xxx'; //Can set this to xxx to see that it is not connecting to LD and errors occur in console but it's bootstrapped.
+      const FLAG_KEY = 'widget-one';
+      let apiBootstrapData = null;
+      let apiBootstrapClient = null;
+      
+      context = {
+        key: 'randy-key',
+        name: 'Randy',
+        kind: 'user'
+      }
+
+      async function bootstrapAPI() {
+        const response = await fetch(BOOTSTRAP_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(context)
+        });
+        apiBootstrapData = await response.json();
+        console.log(apiBootstrapData);
+        
+        // Display JSON data
+        const bootstrapJsonEl = document.getElementById('bootstrapJson');
+        bootstrapJsonEl.textContent = JSON.stringify(apiBootstrapData, null, 2);
+      }
+
+      function updateWidget() {
+        if (!apiBootstrapClient) return;
+        
+        const flagValue = apiBootstrapClient.variation(FLAG_KEY, false);
+        const widgetCircle = document.getElementById('widgetCircle');
+        const widgetValue = document.getElementById('widgetValue');
+        
+        if (flagValue === true) {
+          widgetCircle.className = 'widget-circle on';
+          widgetCircle.textContent = 'ON';
+          widgetValue.textContent = 'true';
+        } else {
+          widgetCircle.className = 'widget-circle off';
+          widgetCircle.textContent = 'OFF';
+          widgetValue.textContent = 'false';
+        }
+      }
+      
+      (async () => {
+        await bootstrapAPI();
+
+        apiBootstrapClient = LDClient.initialize(CLIENT_SIDE_ID, context, {
+          bootstrap: apiBootstrapData
+        });
+
+        apiBootstrapClient.on('ready', () => {
+          console.log(`API Bootstrapped SDK ready`);
+          updateWidget();
+        });
+        
+        apiBootstrapClient.on('change', () => {
+          console.log(`API Bootstrapped SDK updated`);
+          updateWidget();
+        });
+        
+        // Also listen specifically for widget-one changes
+        apiBootstrapClient.on('change:' + FLAG_KEY, () => {
+          console.log(`Widget-one flag changed`);
+          updateWidget();
+        });
+      })();
+    </script>
+  </body>
+</html>

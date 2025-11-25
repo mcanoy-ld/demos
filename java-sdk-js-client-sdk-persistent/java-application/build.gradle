@@ -1,0 +1,49 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.launchdarkly'
+version = '0.0.1-SNAPSHOT'
+description = 'Spring Boot app with LaunchDarkly SDK and Redis persistence'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(24)
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url "https://oss.sonatype.org/content/groups/public/" }
+}
+
+ext.versions = [
+	"sdk": "7.10.2"
+]
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation "com.launchdarkly:launchdarkly-java-server-sdk:${versions.sdk}"
+	implementation "com.launchdarkly:launchdarkly-java-server-sdk-redis-store:3.0.1"
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	runtimeOnly 'redis.clients:jedis:3.10.0'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// Configure bootRun to enable debugging
+tasks.named('bootRun') {
+	// Enable remote debugging on port 5005
+	// Use 'suspend=y' to wait for debugger attachment, or 'suspend=n' to start immediately
+	jvmArgs = [
+		'-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+	]
+}
