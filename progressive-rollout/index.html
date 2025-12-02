@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Progressive Rollout Grid</title>
+  <script src="https://unpkg.com/launchdarkly-js-client-sdk@3"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 5px;
+      font-family: Arial, sans-serif;
+      background: #002730;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: white;
+      margin: 5px 0;
+      font-size: 1.5em;
+    }
+    .client-id-input {
+      text-align: center;
+      margin: 5px 0;
+      color: white;
+    }
+    .client-id-input input {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 300px;
+      font-size: 0.9em;
+    }
+    .client-id-input button {
+      padding: 5px 15px;
+      margin-left: 5px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      background: #333;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .client-id-input button:hover {
+      background: #555;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2px;
+      background: white;
+      padding: 4px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .grid-cell {
+      border: 1px solid #333;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ccc;
+      font-weight: bold;
+      font-size: 0.5em;
+      color: #333;
+      padding: 1px;
+      text-align: center;
+      word-break: break-word;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .grid-cell.enabled {
+      background-color: #1e88e5;
+      border-color: #1e88e5;
+      color: white;
+    }
+    .grid-cell.disabled {
+      background-color: #8b0000;
+      border-color: #8b0000;
+      color: white;
+    }
+    .info {
+      background: white;
+      padding: 5px;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Progressive Rollout Grid</h1>
+    
+    <div class="client-id-input">
+      <label for="clientIdInput" style="color: white;">LaunchDarkly Client ID: </label>
+      <input type="text" id="clientIdInput" placeholder="Enter Client ID" value="">
+      <button id="updateClientIdBtn">Update</button>
+    </div>
+    
+    <div class="grid-container" id="gridContainer"></div>
+    
+    <div class="info">
+      <p><strong>Blue:</strong> <span id="blueCount">0</span> | 
+         <strong>Red:</strong> <span id="redCount">0</span> | 
+         <strong>Total:</strong> 100 | 
+         <strong>Client ID:</strong> <span id="clientIdDisplay"></span> 
+         <label style="margin-left: 5px; font-weight: normal; cursor: pointer;">
+           <input type="checkbox" id="showClientId" style="cursor: pointer;"> <span id="showHideLabel">Show</span>
+         </label></p>
+    </div>
+  </div>
+
+  <script>
+    var clientId = 'your-client-id-here'
+    const flagKey = 'progressive-rollout-example';
+    
+    
+    // Update client ID function
+    function updateClientId(newClientId) {
+      if (!newClientId || newClientId.trim() === '') {
+        alert('Please enter a valid Client ID');
+        return;
+      }
+      
+      // Close all existing clients
+      clients.forEach(client => {
+        try {
+          client.close();
+        } catch (e) {
+          console.error('Error closing client:', e);
+        }
+      });
+      clients = [];
+      
+      // Update the clientId variable
+      clientId = newClientId.trim();
+      
+      // Clear the input field
+      const input = document.getElementById('clientIdInput');
+      if (input) {
+        input.value = '';
+      }
+      
+      // Update the display
+      updateClientIdDisplay();
+      
+      // Reinitialize all clients with new client ID
+      if (usersData.length > 0) {
+        usersData.forEach((user, index) => {
+          const context = {
+            kind: 'user',
+            key: user.key,
+            name: user.name,
+            favoriteColor: user.favoriteColor
+          };
+          
+          console.log(`Reinitializing client for ${user.name} (${user.key})`);
+          const ldClient = LDClient.initialize(clientId, context);
+          clients.push(ldClient);
+          
+          ldClient.on('ready', () => {
+            console.log(`Ready event fired for ${user.name}`);
+            renderEnv(ldClient, index);
+          });
+          
+          ldClient.on('change', () => {
+            console.log(`Change event fired for ${user.name}`);
+            renderEnv(ldClient, index);
+          });
+        });
+        
+        console.log(`Reinitialized ${usersData.length} LaunchDarkly clients with new Client ID`);
+      }
+    }
+    
+    // Set up update button
+    document.addEventListener('DOMContentLoaded', () => {
+      const updateBtn = document.getElementById('updateClientIdBtn');
+      const input = document.getElementById('clientIdInput');
+      
+      if (updateBtn && input) {
+        updateBtn.addEventListener('click', () => {
+          updateClientId(input.value);
+        });
+        
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            updateClientId(input.value);
+          }
+        });
+      }
+    });
+    
+    // Also set up if DOM is already loaded
+    if (document.readyState !== 'loading') {
+      const updateBtn = document.getElementById('updateClientIdBtn');
+      const inputEl = document.getElementById('clientIdInput');
+      if (updateBtn && inputEl) {
+        updateBtn.addEventListener('click', () => {
+          updateClientId(inputEl.value);
+        });
+        inputEl.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            updateClientId(inputEl.value);
+          }
+        });
+      }
+    }
+    
+    // Mask/unmask client ID
+    function maskClientId(id) {
+      if (id.length <= 8) return '****';
+      return id.substring(0, 4) + '****' + id.substring(id.length - 4);
+    }
+    
+    function updateClientIdDisplay() {
+      const showCheckbox = document.getElementById('showClientId');
+      const displayEl = document.getElementById('clientIdDisplay');
+      const labelEl = document.getElementById('showHideLabel');
+      if (displayEl) {
+        displayEl.textContent = showCheckbox.checked ? clientId : maskClientId(clientId);
+      }
+      if (labelEl) {
+        labelEl.textContent = showCheckbox.checked ? 'Hide' : 'Show';
+      }
+    }
+    
+    // Set up checkbox listener
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkbox = document.getElementById('showClientId');
+      if (checkbox) {
+        checkbox.addEventListener('change', updateClientIdDisplay);
+        // Initial display (masked)
+        updateClientIdDisplay();
+      }
+    });
+    
+    // Also set it immediately if DOM is already loaded
+    if (document.readyState !== 'loading') {
+      const checkbox = document.getElementById('showClientId');
+      if (checkbox) {
+        checkbox.addEventListener('change', updateClientIdDisplay);
+        updateClientIdDisplay();
+      }
+    }
+
+    const basicContext = {
+      kind: 'user',
+      key: 'basic-key',
+      name: 'Basil',
+      tier: 'Free'
+    };
+
+    function updateCounts() {
+        let blueCount = 0;
+        let redCount = 0;
+        
+        // Count all cells
+        for (let i = 0; i < 100; i++) {
+            const cell = document.getElementById(`cell-${i}`);
+            if (cell) {
+                if (cell.classList.contains('enabled')) {
+                    blueCount++;
+                } else {
+                    redCount++;
+                }
+            }
+        }
+        
+        // Update the display
+        document.getElementById('blueCount').textContent = blueCount;
+        document.getElementById('redCount').textContent = redCount;
+    }
+
+    function renderEnv(ldclient, cellIndex) {
+        console.log(`Render for cell ${cellIndex}!`);
+        const flagValue = ldclient.variation(flagKey, false);
+        console.log(`Flag value for cell ${cellIndex}:`, flagValue);
+        const cell = document.getElementById(`cell-${cellIndex}`);
+        if (cell && usersData[cellIndex]) {
+            // Update the class for color
+            cell.className = 'grid-cell ' + (flagValue ? 'enabled' : 'disabled');
+            
+            // Update text content: name + checkmark or X
+            const userName = usersData[cellIndex].name;
+            const symbol = flagValue ? '✓' : '✗';
+            cell.textContent = userName + ' ' + symbol;
+            
+            // Recalculate counts after updating the cell
+            updateCounts();
+        }
+    }
+
+    
+    
+    let usersData = [];
+    let clients = [];
+    
+    // Load users.json and create grid with names, then initialize LaunchDarkly clients
+    async function loadUsersAndCreateGrid() {
+      try {
+        const response = await fetch('users.json');
+        usersData = await response.json();
+        console.log('Users data loaded:', usersData);
+        console.log('Number of users:', usersData.length);
+        
+        const gridContainer = document.getElementById('gridContainer');
+        let blueCount = 0;
+        let redCount = 0;
+        
+        // Create grid cells with user names
+        usersData.forEach((user, i) => {
+          const cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.id = `cell-${i}`;
+          
+          // Initial state - will be updated by LaunchDarkly
+          cell.className += ' disabled';
+          
+          // Display the user's name with X (initial state - false)
+          cell.textContent = user.name + ' ✗';
+          cell.title = `${user.name} (${user.key})`;
+          gridContainer.appendChild(cell);
+        });
+        
+        // Initial count update
+        updateCounts();
+        
+        console.log('Grid created!');
+        
+        // Initialize LaunchDarkly client for each user
+        usersData.forEach((user, index) => {
+          const context = {
+            kind: 'user',
+            key: user.key,
+            name: user.name,
+            favoriteColor: user.favoriteColor
+          };
+          
+          console.log(`Initializing LaunchDarkly client for ${user.name} (${user.key})`);
+          const ldClient = LDClient.initialize(clientId, context);
+          clients.push(ldClient);
+          
+          // On ready event
+          ldClient.on('ready', () => {
+            console.log(`Ready event fired for ${user.name}`);
+            renderEnv(ldClient, index);
+          });
+          
+          // On change event
+          ldClient.on('change', () => {
+            console.log(`Change event fired for ${user.name}`);
+            renderEnv(ldClient, index);
+          });
+        });
+        
+        console.log(`Initialized ${usersData.length} LaunchDarkly clients`);
+      } catch (error) {
+        console.error('Error loading users.json:', error);
+      }
+    }
+    
+    // Wait for LDClient to be available
+    if (typeof LDClient !== 'undefined') {
+      loadUsersAndCreateGrid();
+    } else {
+      window.addEventListener('load', () => {
+        if (typeof LDClient !== 'undefined') {
+          loadUsersAndCreateGrid();
+        } else {
+          console.error('LaunchDarkly SDK not loaded');
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>
