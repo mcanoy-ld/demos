@@ -2,6 +2,8 @@
 
 A JavaScript application that displays a 10x10 grid of users, with each grid cell controlled by its own LaunchDarkly client instance and context. Using this grid can help demonstrated the use of different types of rollouts.
 
+<img src="rollout.png" alt="Progressive Rollout Grid" width="800">
+
 ## Features
 
 - **10x10 Grid**: 100 unique users displayed in a grid layout
