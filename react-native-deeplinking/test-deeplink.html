@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Deep Link</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    a {
+      display: inline-block;
+      padding: 15px 30px;
+      margin: 10px 5px;
+      background: #007AFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    a:hover {
+      background: #0051D5;
+    }
+    .green { background: #34C759; }
+    .green:hover { background: #28A745; }
+    .orange { background: #FF9500; }
+    .orange:hover { background: #E6850E; }
+    h1 { color: #333; }
+    p { color: #666; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <h1>Deep Link Test</h1>
+  <p>Click a link below to test the deep link. Make sure your app is running in the iOS Simulator first!</p>
+  
+  <a href="darkly://setuser?magicuser=123456">Set User: 123456</a>
+  <a href="darkly://setuser?magicuser=789012" class="green">Set User: 789012</a>
+  <a href="darkly://setuser?magicuser=admin123" class="orange">Set User: admin123</a>
+  
+  <p style="margin-top: 30px; font-size: 14px; color: #999;">
+    <strong>Note:</strong> This works when opened in Safari <em>inside the iOS Simulator</em>, not in your Mac's Safari browser.
+  </p>
+</body>
+</html>
+
