@@ -19,6 +19,22 @@ Demonstrates using a persistent Redis datastore with the LaunchDarkly Java Serve
 
 ---
 
+### [node-fdn-v2-persistence](./node-fdn-v2-persistence/)
+**Node.js FDNv2 Redis Persistence Demo**
+
+A Node.js/Express application demonstrating LaunchDarkly FDNv2 (Feature Data Network v2) with Redis persistence for resilience during LaunchDarkly outages. The application serves from cache at all times and can bootstrap from Redis when LaunchDarkly is unavailable.
+
+**Key Features:**
+- Redis persistent feature store with FDNv2
+- Online/offline mode switching via environment variable
+- Continues serving from cache during LaunchDarkly outages
+- Bootstrap from Redis on startup when LaunchDarkly is unavailable
+- Configurable flag key and SDK key via environment variables
+- Dynamic context via URL parameter (`?name=xxx`)
+- Detailed flag evaluation logging with `variationDetail`
+
+---
+
 ### [progressive-rollout](./progressive-rollout/)
 **Progressive Rollout Grid Visualization**
 
