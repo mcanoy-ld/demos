@@ -1,0 +1,26 @@
+{
+  "name": "node-fdn-v2-persistence",
+  "version": "1.0.0",
+  "description": "Node.js application serving an AI company home page",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@launchdarkly/node-server-sdk": "^9.10.3",
+    "@launchdarkly/node-server-sdk-redis": "^4.2.15",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
