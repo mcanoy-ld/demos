@@ -2,5 +2,6 @@ typescript/node_modules
 typescript/.yarn.lock
 .DS_Store
 *.zip
+.vscode/
 
 
