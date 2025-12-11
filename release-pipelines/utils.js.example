@@ -1,0 +1,15 @@
+/* Copy this file to utils.js and update with your LaunchDarkly client-side IDs */
+
+// Set your feature flag key here
+const flagKey = 'your-flag-key';
+
+clientSideIdMap = new Map();
+clientSideIdMap.set('dev', 'your-dev-client-side-id');
+clientSideIdMap.set('int', 'your-int-client-side-id');
+clientSideIdMap.set('qa', 'your-qa-client-side-id');
+clientSideIdMap.set('prod', 'your-prod-client-side-id');
+
+function getClientSide(env) {
+    return clientSideIdMap.get(env);
+}
+

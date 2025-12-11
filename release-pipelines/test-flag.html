@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaunchDarkly Flag Test</title>
+    <script src="https://unpkg.com/launchdarkly-js-client-sdk@3"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LaunchDarkly Flag Test</h1>
+        
+        <div class="input-group">
+            <label for="clientId">Client-side ID:</label>
+            <input type="text" id="clientId" value="xxx" placeholder="Enter your LaunchDarkly client-side ID">
+        </div>
+        
+        <div class="input-group">
+            <label for="flagKey">Flag Key:</label>
+            <input type="text" id="flagKey" value="release-widget-ui" placeholder="Enter flag key">
+        </div>
+        
+        <div class="input-group">
+            <label for="contextKey">Context Key:</label>
+            <input type="text" id="contextKey" value="test-user" placeholder="Enter context key">
+        </div>
+        
+        <button id="initBtn" onclick="initializeLD()">Initialize & Evaluate</button>
+        <button id="evaluateBtn" onclick="evaluateFlag()" disabled>Re-evaluate Flag</button>
+        <button id="clearBtn" onclick="clearLog()" style="background: #666;">Clear Log</button>
+        
+        <div id="status"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let ldClient = null;
+        const output = document.getElementById('output');
+        const statusDiv = document.getElementById('status');
+        const initBtn = document.getElementById('initBtn');
+        const evaluateBtn = document.getElementById('evaluateBtn');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            output.textContent = '';
+            log('Log cleared');
+        }
+
+        function setStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function initializeLD() {
+            const clientId = document.getElementById('clientId').value.trim();
+            const flagKey = document.getElementById('flagKey').value.trim();
+            const contextKey = document.getElementById('contextKey').value.trim();
+
+            if (!clientId || clientId === 'xxx') {
+                setStatus('Please enter a valid client-side ID', 'error');
+                log('ERROR: Client-side ID is required');
+                return;
+            }
+
+            if (!flagKey) {
+                setStatus('Please enter a flag key', 'error');
+                log('ERROR: Flag key is required');
+                return;
+            }
+
+            // Close existing client if any
+            if (ldClient) {
+                ldClient.close();
+                ldClient = null;
+            }
+
+            setStatus('Initializing LaunchDarkly client...', 'loading');
+            log('=== Initializing LaunchDarkly Client ===');
+            log(`Client-side ID: ${clientId}`);
+            log(`Flag Key: ${flagKey}`);
+            log(`Context Key: ${contextKey}`);
+
+            // Create context
+            const context = {
+                kind: 'user',
+                key: contextKey,
+                name: 'Test User'
+            };
+
+            log(`Context: ${JSON.stringify(context, null, 2)}`);
+
+            // Initialize LaunchDarkly client
+            ldClient = LDClient.initialize(clientId, context, {
+                application: {
+                    id: 'flag-test-demo',
+                    version: '1.0.0'
+                }
+            });
+
+            // Set up event handlers
+            ldClient.on('ready', () => {
+                setStatus('LaunchDarkly client ready!', 'ready');
+                log('✓ LaunchDarkly client initialized and ready');
+                evaluateBtn.disabled = false;
+                evaluateFlag();
+            });
+
+            ldClient.on('failed', (error) => {
+                setStatus('Failed to initialize LaunchDarkly client', 'error');
+                log(`✗ Failed to initialize: ${error}`);
+            });
+
+            ldClient.on('change', () => {
+                log('→ Flag configuration changed, re-evaluating...');
+                evaluateFlag();
+            });
+
+            ldClient.on('change:release-widget-ui', () => {
+                log('→ release-widget-ui flag changed, re-evaluating...');
+                evaluateFlag();
+            });
+        }
+
+        function evaluateFlag() {
+            if (!ldClient) {
+                setStatus('Please initialize LaunchDarkly client first', 'error');
+                log('ERROR: LaunchDarkly client not initialized');
+                return;
+            }
+
+            const flagKey = document.getElementById('flagKey').value.trim();
+            
+            if (!flagKey) {
+                log('ERROR: Flag key is required');
+                return;
+            }
+
+            log('\n=== Evaluating Flag ===');
+            log(`Flag Key: ${flagKey}`);
+
+            try {
+                // Use variationDetail to get detailed evaluation information
+                const detail = ldClient.variationDetail(flagKey, false);
+                
+                log('\n--- Variation Detail ---');
+                log(JSON.stringify(detail, null, 2));
+                
+                const flagValue = detail.value;
+                const reason = detail.reason;
+
+                log('\n--- Summary ---');
+                log(`Flag Value: ${flagValue}`);
+                log(`Reason Kind: ${reason?.kind || 'Unknown'}`);
+
+                if (reason) {
+                    log('\n--- Reason Details ---');
+                    
+                    if (reason.kind === 'FALLTHROUGH') {
+                        log(`Type: Fallthrough (default variation)`);
+                        log(`Variation Index: ${reason.variationIndex}`);
+                    } else if (reason.kind === 'RULE_MATCH') {
+                        log(`Type: Rule Match`);
+                        log(`Rule Index: ${reason.ruleIndex}`);
+                        log(`Variation Index: ${reason.variationIndex}`);
+                    } else if (reason.kind === 'TARGET_MATCH') {
+                        log(`Type: Target Match`);
+                        log(`Variation Index: ${reason.variationIndex}`);
+                    } else if (reason.kind === 'OFF') {
+                        log(`Type: Flag is OFF`);
+                        log(`Off Variation Index: ${reason.variationIndex}`);
+                    } else if (reason.kind === 'ERROR') {
+                        log(`Type: Error`);
+                        log(`Error Kind: ${reason.errorKind || 'Unknown error'}`);
+                    } else {
+                        log(`Type: ${reason.kind || 'Unknown'}`);
+                        log(`Full Reason: ${JSON.stringify(reason, null, 2)}`);
+                    }
+                } else {
+                    log('No reason provided');
+                }
+
+                log('\n=== Evaluation Complete ===\n');
+            } catch (error) {
+                log(`ERROR evaluating flag: ${error.message}`);
+                console.error('Flag evaluation error:', error);
+            }
+        }
+
+        // Auto-initialize on page load if client ID is provided
+        window.addEventListener('load', () => {
+            const clientId = document.getElementById('clientId').value.trim();
+            if (clientId && clientId !== 'xxx') {
+                log('Page loaded. Click "Initialize & Evaluate" to start.');
+            } else {
+                log('Page loaded. Enter your client-side ID and click "Initialize & Evaluate".');
+            }
+        });
+    </script>
+</body>
+</html>
+

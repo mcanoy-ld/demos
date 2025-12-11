@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1">
+    <title>Release Pipelines Demo</title>
+    <script src="https://unpkg.com/launchdarkly-js-client-sdk@3"></script>
+    <script src="utils.js"></script>
+    <script src="rp.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    /> 
+  </head>
+  <body>
+    <div style="padding: 20px;">
+      <header class="page-header">
+        <h1>Release Pipelines</h1>
+      </header>
+      <div id="lderror"></div>
+      <div class="pipeline-container">
+        <!-- Stage 1: Dev -->
+        <div class="pipeline-stage">
+          <div class="pipeline-panel" id="dev-panel" data-context='{"kind":"user","key":"basic-key","name":"Basil","tier":"Free"}'>
+            <div class="stage-number">1</div>
+            <h3>Dev</h3>
+            <div class="stage-label">All Users</div>
+            <input type="checkbox" id="dev-any"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+        
+        <!-- Stage 2: QA -->
+        <div class="pipeline-stage">
+          <div class="pipeline-panel" id="qa-panel" data-context='{"kind":"user","key":"basic-key","name":"Basil","tier":"Free"}'>
+            <div class="stage-number">2</div>
+            <h3>QA</h3>
+            <div class="stage-label">All Users</div>
+            <input type="checkbox" id="qa-any"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+        
+        <!-- Stage 3: Int -->
+        <div class="pipeline-stage">
+          <div class="pipeline-panel" id="int-panel" data-context='{"kind":"user","key":"basic-key","name":"Basil","tier":"Free"}'>
+            <div class="stage-number">3</div>
+            <h3>Int</h3>
+            <div class="stage-label">All Users</div>
+            <input type="checkbox" id="int-any"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+        
+        <!-- Stage 4: Production (with branching) -->
+        <div class="pipeline-stage prod-stage">
+          <div class="pipeline-panel prod-panel" id="prod-alpha-panel" data-context='{"kind":"user","key":"alpha-key","name":"Alfie","tier":"QA"}'>
+            <div class="stage-number">4a</div>
+            <h3>Prod</h3>
+            <div class="stage-label">QA</div>
+            <input type="checkbox" id="prod-alpha"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+        
+        <div class="pipeline-stage prod-stage">
+          <div class="pipeline-panel prod-panel" id="prod-beta-panel" data-context='{"kind":"user","key":"beta-key","name":"Beto","tier":"Beta"}'>
+            <div class="stage-number">4b</div>
+            <h3>Prod</h3>
+            <div class="stage-label">Beta</div>
+            <input type="checkbox" id="prod-beta"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+        
+        <div class="pipeline-stage prod-stage">
+          <div class="pipeline-panel prod-panel" id="prod-enterprise-panel" data-context='{"kind":"user","key":"enterprise-key","name":"Enzo","tier":"Enterprise"}'>
+            <div class="stage-number">4c</div>
+            <h3>Prod</h3>
+            <div class="stage-label">Enterprise</div>
+            <input type="checkbox" id="prod-enterprise"/>
+          </div>
+          <div class="pipeline-connector">
+            <div class="connector-line"></div>
+            <div class="connector-arrow">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+    function main()
+    {
+      var div = document.createElement('div');
+      document.body.appendChild(div);
+
+      // Check if flagKey is set
+      if (typeof flagKey === 'undefined' || !flagKey || flagKey === 'your-flag-key') {
+        alert('Error: flagKey is not set. Please update utils.js with your feature flag key.');
+        div.replaceChild(document.createTextNode('Error: flagKey is not set. Please update utils.js with your feature flag key.'), div.firstChild);
+        return;
+      }
+
+      if (!getClientSide('dev')) {
+        alert('Error: Client-side IDs are not set. Please add client side ids as described in readme');
+        div.replaceChild(document.createTextNode('Please add client side ids as described in readme'), div.firstChild);
+        return;
+      }
+
+      // Prevent default checkbox behavior while keeping them clickable
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('click', function(e) {
+          e.preventDefault(); // Prevent the default checked state change
+          // The checkbox state can now be controlled programmatically
+          // You can add your custom logic here
+        });
+      });
+
+      // Add hover tooltips for context information
+      const panels = document.querySelectorAll('.pipeline-panel');
+      panels.forEach(panel => {
+        panel.addEventListener('mouseenter', function() {
+          const contextData = JSON.parse(this.dataset.context);
+          showContextTooltip(this, contextData);
+        });
+        
+        panel.addEventListener('mouseleave', function() {
+          hideContextTooltip();
+        });
+      });
+
+      initLDClients('dev', 'qa', 'int', 'prod');
+    }
+
+    function showContextTooltip(panel, contextData) {
+      // Remove any existing tooltip
+      hideContextTooltip();
+      
+      const tooltip = document.createElement('div');
+      tooltip.className = 'context-tooltip';
+      tooltip.innerHTML = `
+        <div class="tooltip-header">Context Info</div>
+        <div class="tooltip-content">
+          <div><strong>Kind:</strong> ${contextData.kind}</div>
+          <div><strong>Key:</strong> ${contextData.key}</div>
+          <div><strong>Name:</strong> ${contextData.name}</div>
+          <div><strong>Tier:</strong> ${contextData.tier}</div>
+        </div>
+      `;
+      
+      document.body.appendChild(tooltip);
+      
+      // Position tooltip near the panel
+      const panelRect = panel.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      
+      let left = panelRect.left + (panelRect.width / 2) - (tooltipRect.width / 2);
+      let top = panelRect.bottom + 10;
+      
+      // Ensure tooltip stays within viewport
+      if (left < 10) left = 10;
+      if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipRect.width - 10;
+      }
+      if (top + tooltipRect.height > window.innerHeight - 10) {
+        top = panelRect.top - tooltipRect.height - 10;
+      }
+      
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    }
+
+    function hideContextTooltip() {
+      const existingTooltip = document.querySelector('.context-tooltip');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+    }
+
+    main();
+    </script>
+  </body>
+</html>
+
