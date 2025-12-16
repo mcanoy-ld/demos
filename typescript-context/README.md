@@ -1,4 +1,4 @@
-# LaunchDarkly SDK for React - Example typescript app
+# LaunchDarkly SDK for React - Context Demo Typescript app
 
 This is a CRA typescript app demonstrating `launchdarkly-react-client-sdk`.
 
