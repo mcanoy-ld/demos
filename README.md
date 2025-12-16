@@ -89,10 +89,10 @@ A Ruby/Sinatra application demonstrating the same streaming vs polling functiona
 
 ---
 
-### [typescript](./typescript/)
+### [typescript-context](./typescript-context/)
 **TypeScript React Client-Side SDK Demo**
 
-A Create React App TypeScript application demonstrating the LaunchDarkly React Client SDK with real-time flag updates.
+A Create React App TypeScript application demonstrating the LaunchDarkly React Client SDK with real-time flag updates and showing context.
 
 **Key Features:**
 - React hooks integration (`useFlags`, `useBoolVariation`)
