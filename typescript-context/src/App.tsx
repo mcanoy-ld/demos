@@ -113,12 +113,12 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
             {/* Right Panel - Flag Results */}
             <div className="panel">
               <h3>Flag Results</h3>
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
                 <div className={`flag-box ${widgetOne ? 'on' : 'off'}`}>
-                  {widgetOne ? 'Widget Flag ON' : 'Widget Flag OFF'}
+                  {widgetOne ? '✓ Widget Flag ON' : '✗ Widget Flag OFF'}
                 </div>
                 <div className={`flag-box ${soCal ? 'on' : 'off'}`}>
-                  {soCal ? 'So Cal Flag ON' : 'So Cal Flag OFF'}
+                  {soCal ? '✓ So Cal Flag ON' : '✗ So Cal Flag OFF'}
                 </div>
               </div>
             </div>
@@ -133,7 +133,11 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
         {/* Hamburger Menu */}
         <HamburgerMenu onNavigate={handleNavigation} />
         
-        <img src={logo} className="App-logo" alt="logo" />
+        <div className="app-title-section">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h1 className="app-title">LaunchDarkly Context Demo</h1>
+          <p className="app-subtitle">Test feature flags with different contexts</p>
+        </div>
         {renderModuleContent()}
       </header>
       {/* LaunchDarkly Toolbar */}

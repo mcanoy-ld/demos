@@ -26,9 +26,10 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onNavigate }) => {
         ☰
       </button>
       <div className={`menu-dropdown ${isMenuOpen ? 'open' : ''}`}>
-        <a href="#" className="menu-item" onClick={() => handleNavigation('settings')}>Settings</a>
-        <a href="#" className="menu-item" onClick={() => handleNavigation('profile')}>Pipelines</a>
-        <a href="#" className="menu-item" onClick={() => handleNavigation('help')}>Help</a>
+        <div className="menu-item" onClick={() => handleNavigation('main')}>Home</div>
+        <div className="menu-item" onClick={() => handleNavigation('settings')}>Settings</div>
+        <div className="menu-item" onClick={() => handleNavigation('profile')}>Pipelines</div>
+        <div className="menu-item" onClick={() => handleNavigation('help')}>Help</div>
       </div>
     </div>
   );
