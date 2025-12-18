@@ -24,7 +24,7 @@
 		<ApplicationTitle>ReservationsDotnetMaui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.ReservationsDotnetMaui</ApplicationId>
+		<ApplicationId>com.launchdarkly.demo.ReservationsDotnetMaui</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
