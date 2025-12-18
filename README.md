@@ -114,6 +114,24 @@ A .NET MAUI (Multi-platform App UI) application demonstrating LaunchDarkly's cli
 
 ---
 
+### [dotnet-server](./dotnet-server/)
+**.NET Server-Side SDK Web API Demo**
+
+A .NET 10.0 web API application demonstrating LaunchDarkly's server-side .NET SDK. Provides REST API endpoints to explore and evaluate feature flags with custom contexts.
+
+**Key Features:**
+- REST API for flag evaluation
+- Swagger UI for interactive API exploration
+- Custom context support via query parameters
+- Endpoints to retrieve all flags or evaluate individual flags
+- Server-side SDK integration patterns
+
+**API Endpoints:**
+- `GET /api/FeatureFlag/all` - Retrieve all feature flags for a default context
+- `GET /api/FeatureFlag/{flagKey}` - Evaluate a specific flag with custom context parameters
+
+---
+
 ### [typescript-context](./typescript-context/)
 **TypeScript React Client-Side SDK Demo**
 
