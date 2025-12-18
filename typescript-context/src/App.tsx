@@ -114,11 +114,21 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
             <div className="panel">
               <h3>Flag Results</h3>
               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
-                <div className={`flag-box ${widgetOne ? 'on' : 'off'}`}>
-                  {widgetOne ? '✓ Widget Flag ON' : '✗ Widget Flag OFF'}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', textAlign: 'left', fontFamily: 'monospace' }}>
+                    key: widget-one
+                  </div>
+                  <div className={`flag-box ${widgetOne ? 'on' : 'off'}`}>
+                    {widgetOne ? '✓ Widget Flag ON' : '✗ Widget Flag OFF'}
+                  </div>
                 </div>
-                <div className={`flag-box ${soCal ? 'on' : 'off'}`}>
-                  {soCal ? '✓ So Cal Flag ON' : '✗ So Cal Flag OFF'}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', textAlign: 'left', fontFamily: 'monospace' }}>
+                    key: so-cal
+                  </div>
+                  <div className={`flag-box ${soCal ? 'on' : 'off'}`}>
+                    {soCal ? '✓ So Cal Flag ON' : '✗ So Cal Flag OFF'}
+                  </div>
                 </div>
               </div>
             </div>
