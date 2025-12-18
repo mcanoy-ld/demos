@@ -1,0 +1,11 @@
+{
+  "LaunchDarkly":{
+    "SdkKey":"sdk-********"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

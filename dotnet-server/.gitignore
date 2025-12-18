@@ -1,0 +1,4 @@
+bin/
+obj/
+appsettings.Development.json
+launch_app.sh
