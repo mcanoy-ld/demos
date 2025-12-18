@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:ReservationsDotnetMaui.Converters"
+             x:Class="ReservationsDotnetMaui.ReservationPage"
+             Title="Reserve a Desk">
+
+
+    <ScrollView>
+        <VerticalStackLayout 
+            Spacing="20" 
+            Padding="20,40">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="10">
+                <Label 
+                    Text="🏢 Office Hoteling"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource Primary}" />
+                
+                <Label 
+                    x:Name="HeaderSubtitleLabel"
+                    Text="Reserve desks and conference rooms"
+                    FontSize="16"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource Gray600}" />
+            </VerticalStackLayout>
+
+            <!-- Office Selection -->
+            <Frame 
+                Padding="20"
+                CornerRadius="12"
+                HasShadow="True"
+                BackgroundColor="{StaticResource White}"
+                BorderColor="{StaticResource Gray200}">
+                <VerticalStackLayout Spacing="15">
+                    <Label 
+                        Text="Select Office"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray900}" />
+                    
+                    <Picker 
+                        x:Name="OfficePicker"
+                        Title="Choose an office..."
+                        HeightRequest="50"
+                        FontSize="16"
+                        BackgroundColor="{StaticResource Gray100}"
+                        TextColor="{StaticResource Gray900}"
+                        SelectedIndexChanged="OnOfficeSelected" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Tabs for Desks and Rooms -->
+            <HorizontalStackLayout 
+                Spacing="10"
+                HorizontalOptions="Center">
+                <Button 
+                    x:Name="DesksTabButton"
+                    Text="Desks"
+                    Clicked="OnDesksTabClicked"
+                    WidthRequest="120"
+                    HeightRequest="40" />
+                <Button 
+                    x:Name="RoomsTabButton"
+                    Text="Conference Rooms"
+                    Clicked="OnRoomsTabClicked"
+                    WidthRequest="180"
+                    HeightRequest="40" />
+            </HorizontalStackLayout>
+
+            <!-- Desks Section -->
+            <Frame 
+                x:Name="DesksSection"
+                Padding="20"
+                CornerRadius="12"
+                HasShadow="True"
+                BackgroundColor="{StaticResource White}"
+                BorderColor="{StaticResource Gray200}"
+                IsVisible="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label 
+                        Text="Available Desks"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray900}" />
+                    
+                    <CollectionView 
+                        x:Name="DesksCollectionView"
+                        ItemsSource="{Binding Desks}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnDeskSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame 
+                                    Padding="15"
+                                    Margin="0,5"
+                                    CornerRadius="8"
+                                    HasShadow="False"
+                                    BackgroundColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}, ConverterParameter=0.1}"
+                                    BorderColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                            <Label 
+                                                Text="{Binding Name}"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource Gray900}" />
+                                            <Label 
+                                                Text="{Binding IsReserved, Converter={StaticResource AvailabilityConverter}}"
+                                                FontSize="12"
+                                                TextColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}}" />
+                                            <Label 
+                                                x:Name="ReservedByLabel"
+                                                Text="{Binding ReservedBy, StringFormat='Reserved by: {0}'}"
+                                                FontSize="11"
+                                                TextColor="{StaticResource Gray600}"
+                                                IsVisible="{Binding IsReserved}" />
+                                        </VerticalStackLayout>
+                                        
+                                        <Button 
+                                            Grid.Column="1"
+                                            x:Name="ReserveDeskButton"
+                                            Text="{Binding IsReserved, Converter={StaticResource ReserveButtonConverter}}"
+                                            Clicked="OnReserveDeskClicked"
+                                            CommandParameter="{Binding Id}"
+                                            IsEnabled="{Binding IsReserved, Converter={StaticResource InvertBoolConverter}}"
+                                            WidthRequest="100"
+                                            HeightRequest="36"
+                                            FontSize="12" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Conference Rooms Section -->
+            <Frame 
+                x:Name="RoomsSection"
+                Padding="20"
+                CornerRadius="12"
+                HasShadow="True"
+                BackgroundColor="{StaticResource White}"
+                BorderColor="{StaticResource Gray200}"
+                IsVisible="False">
+                <VerticalStackLayout Spacing="15">
+                    <Label 
+                        Text="Conference Rooms"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray900}" />
+                    
+                    <CollectionView 
+                        x:Name="RoomsCollectionView"
+                        ItemsSource="{Binding Rooms}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRoomSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame 
+                                    Padding="15"
+                                    Margin="0,5"
+                                    CornerRadius="8"
+                                    HasShadow="False"
+                                    BackgroundColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}, ConverterParameter=0.1}"
+                                    BorderColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                            <Label 
+                                                Text="{Binding Name}"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource Gray900}" />
+                                            <Label 
+                                                Text="{Binding Capacity, StringFormat='Capacity: {0} people'}"
+                                                FontSize="12"
+                                                TextColor="{StaticResource Gray600}" />
+                                            <Label 
+                                                Text="{Binding IsReserved, Converter={StaticResource AvailabilityConverter}}"
+                                                FontSize="12"
+                                                TextColor="{Binding IsReserved, Converter={StaticResource AvailabilityColorConverter}}" />
+                                            <Label 
+                                                Text="{Binding ReservedBy, StringFormat='Reserved by: {0}'}"
+                                                FontSize="11"
+                                                TextColor="{StaticResource Gray600}"
+                                                IsVisible="{Binding IsReserved}" />
+                                        </VerticalStackLayout>
+                                        
+                                        <Button 
+                                            Grid.Column="1"
+                                            Text="{Binding IsReserved, Converter={StaticResource ReserveButtonConverter}}"
+                                            Clicked="OnReserveRoomClicked"
+                                            CommandParameter="{Binding Id}"
+                                            IsEnabled="{Binding IsReserved, Converter={StaticResource InvertBoolConverter}}"
+                                            WidthRequest="100"
+                                            HeightRequest="36"
+                                            FontSize="12" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- My Reservations Section -->
+            <Frame 
+                Padding="20"
+                CornerRadius="12"
+                HasShadow="True"
+                BackgroundColor="{StaticResource Secondary}"
+                BorderColor="{StaticResource PrimaryDark}">
+                <VerticalStackLayout Spacing="15">
+                    <Label 
+                        Text="My Reservations"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Primary}" />
+                    
+                    <CollectionView 
+                        x:Name="MyReservationsCollectionView"
+                        ItemsSource="{Binding MyReservations}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame 
+                                    Padding="15"
+                                    Margin="0,5"
+                                    CornerRadius="8"
+                                    HasShadow="False"
+                                    BackgroundColor="{StaticResource White}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                            <Label 
+                                                Text="{Binding ResourceName}"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource Gray900}" />
+                                            <Label 
+                                                Text="{Binding OfficeName}"
+                                                FontSize="12"
+                                                TextColor="{StaticResource Gray600}" />
+                                            <Label 
+                                                Text="{Binding ReservedUntil, StringFormat='Until: {0:g}'}"
+                                                FontSize="12"
+                                                TextColor="{StaticResource Gray600}" />
+                                        </VerticalStackLayout>
+                                        
+                                        <Button 
+                                            Grid.Column="1"
+                                            Text="Cancel"
+                                            Clicked="OnCancelReservationClicked"
+                                            CommandParameter="{Binding Id}"
+                                            BackgroundColor="{StaticResource Red}"
+                                            TextColor="White"
+                                            WidthRequest="80"
+                                            HeightRequest="36"
+                                            FontSize="12" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    
+                    <Label 
+                        x:Name="NoReservationsLabel"
+                        Text="No active reservations"
+                        FontSize="14"
+                        TextColor="{StaticResource Gray600}"
+                        HorizontalOptions="Center"
+                        IsVisible="False" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+

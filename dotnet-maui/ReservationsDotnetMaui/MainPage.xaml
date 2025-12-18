@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ReservationsDotnetMaui.MainPage"
+             x:Name="MainPageLayout">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Top Right Header -->
+        <HorizontalStackLayout 
+            Grid.Row="0"
+            HorizontalOptions="End"
+            VerticalOptions="Start"
+            Spacing="8"
+            Margin="15,15,15,0">
+            
+            <!-- LaunchDarkly Label -->
+            <Label 
+                x:Name="LaunchDarklyLabel"
+                Text="🚩 LaunchDarkly"
+                FontSize="16"
+                FontAttributes="Bold"
+                TextColor="{StaticResource Primary}"
+                VerticalOptions="Center" />
+            
+            <!-- User Profile Badge -->
+            <Border 
+                x:Name="UserBadge"
+                Padding="15,8"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 20,20,20,20"
+                Stroke="{StaticResource PrimaryDark}"
+                BackgroundColor="{StaticResource Primary}"
+                IsVisible="False">
+                <Label 
+                    x:Name="UserInitialLabel"
+                    Text="?"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource White}"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center" />
+            </Border>
+        </HorizontalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout 
+                Spacing="15" 
+                Padding="20,20"
+                VerticalOptions="Start">
+
+            <!-- Context Display -->
+            <Border 
+                Padding="12"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                BackgroundColor="{StaticResource Gray100}">
+                <VerticalStackLayout Spacing="3">
+                    <Label 
+                        Text="Current Context"
+                        FontSize="11"
+                        TextColor="{StaticResource Gray500}"
+                        FontAttributes="Bold" />
+                    <Label 
+                        x:Name="ContextLabel"
+                        Text="Loading..."
+                        FontSize="13"
+                        TextColor="{StaticResource Gray900}"
+                        HorizontalOptions="Start" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Status Card -->
+            <Border 
+                x:Name="StatusCard"
+                Padding="20"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12,12,12,12"
+                Stroke="{StaticResource Gray200}"
+                BackgroundColor="{StaticResource White}"
+                Margin="0,10">
+                <VerticalStackLayout Spacing="12">
+                    
+                    <!-- Flag Key -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label 
+                            Text="Flag Key"
+                            FontSize="12"
+                            TextColor="{StaticResource Gray500}"
+                            FontAttributes="Bold" />
+                        <Label 
+                            x:Name="FlagKeyLabel"
+                            Text="Loading..."
+                            FontSize="16"
+                            TextColor="{StaticResource Gray900}"
+                            FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <!-- Status Indicator -->
+                    <HorizontalStackLayout 
+                        Spacing="10"
+                        VerticalOptions="Center">
+                        <Border 
+                            x:Name="StatusIndicator"
+                            WidthRequest="16"
+                            HeightRequest="16"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8,8,8,8"
+                            Padding="0"
+                            BackgroundColor="{StaticResource Gray400}"
+                            VerticalOptions="Center" />
+                        
+                        <Label 
+                            x:Name="StatusLabel"
+                            Text="Checking..."
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource Gray900}"
+                            VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <!-- Flag Value -->
+                    <Border 
+                        x:Name="ValueFrame"
+                        Padding="15"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10,10,10,10"
+                        Stroke="{StaticResource Gray200}"
+                        BackgroundColor="{StaticResource Gray100}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label 
+                                Text="Current Value"
+                                FontSize="11"
+                                TextColor="{StaticResource Gray500}"
+                                FontAttributes="Bold" />
+                            <Label 
+                                x:Name="FlagValueLabel"
+                                Text="—"
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Center"
+                                TextColor="{StaticResource Gray900}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Hoteling Flag Status Card -->
+            <Border 
+                x:Name="HotelingStatusCard"
+                Padding="20"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12,12,12,12"
+                Stroke="{StaticResource Gray200}"
+                BackgroundColor="{StaticResource White}"
+                Margin="0,10">
+                <VerticalStackLayout Spacing="12">
+                    
+                    <!-- Flag Key -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label 
+                            Text="Flag Key"
+                            FontSize="12"
+                            TextColor="{StaticResource Gray500}"
+                            FontAttributes="Bold" />
+                        <Label 
+                            x:Name="HotelingFlagKeyLabel"
+                            Text="enabled-office-conf-room-hoteling"
+                            FontSize="16"
+                            TextColor="{StaticResource Gray900}"
+                            FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <!-- Status Indicator -->
+                    <HorizontalStackLayout 
+                        Spacing="10"
+                        VerticalOptions="Center">
+                        <Border 
+                            x:Name="HotelingStatusIndicator"
+                            WidthRequest="16"
+                            HeightRequest="16"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8,8,8,8"
+                            Padding="0"
+                            BackgroundColor="{StaticResource Gray400}"
+                            VerticalOptions="Center" />
+                        
+                        <Label 
+                            x:Name="HotelingStatusLabel"
+                            Text="Checking..."
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource Gray900}"
+                            VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <!-- Flag Value -->
+                    <Border 
+                        x:Name="HotelingValueFrame"
+                        Padding="15"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10,10,10,10"
+                        Stroke="{StaticResource Gray200}"
+                        BackgroundColor="{StaticResource Gray100}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label 
+                                Text="Current Value"
+                                FontSize="11"
+                                TextColor="{StaticResource Gray500}"
+                                FontAttributes="Bold" />
+                            <Label 
+                                x:Name="HotelingFlagValueLabel"
+                                Text="—"
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Center"
+                                TextColor="{StaticResource Gray900}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Info Section -->
+            <Border 
+                Padding="15"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource PrimaryDark}"
+                BackgroundColor="{StaticResource Secondary}">
+                <VerticalStackLayout Spacing="5">
+                    <Label 
+                        Text="💡 How it works"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Primary}" />
+                    <Label 
+                        Text="Toggle the flag in your LaunchDarkly dashboard to see the value update in real-time!"
+                        FontSize="11"
+                        TextColor="{StaticResource Gray600}"
+                        LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Reserve Desk Button -->
+            <Button 
+                x:Name="ReserveDeskButton"
+                Text="🏢 Reserve a Desk"
+                Clicked="OnReserveDeskClicked"
+                HeightRequest="44"
+                Margin="0,5,0,10"
+                FontSize="15"
+                FontAttributes="Bold" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
