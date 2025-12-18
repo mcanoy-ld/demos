@@ -89,6 +89,31 @@ A Ruby/Sinatra application demonstrating the same streaming vs polling functiona
 
 ---
 
+### [dotnet-maui](./dotnet-maui/)
+**.NET MAUI Office Reservations App**
+
+A .NET MAUI (Multi-platform App UI) application demonstrating LaunchDarkly's client-side .NET SDK on mobile and desktop platforms. The app includes an office hoteling system for reserving desks and conference rooms, with feature flags controlling functionality.
+
+**Key Features:**
+- Cross-platform support (iOS, Android, macOS Catalyst, Windows)
+- Office hoteling system with desk and conference room reservations
+- Real-time flag updates via streaming
+- Multi-context support (user + office location)
+- Feature flag controls conference room availability
+- Office-specific conference room naming (Downtown LA, Burbank, etc.)
+
+**Platforms Supported:**
+- iOS (Simulator and Device)
+- Android (Emulator and Device)
+- macOS Catalyst
+- Windows
+
+**Includes:**
+- **MAUI App**: Full-featured mobile/desktop application (`ReservationsDotnetMaui`)
+- **Console App**: Simple command-line demo (`DotNetConsoleApp`) for testing SDK integration without mobile development tools
+
+---
+
 ### [typescript-context](./typescript-context/)
 **TypeScript React Client-Side SDK Demo**
 

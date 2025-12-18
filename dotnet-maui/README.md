@@ -1,6 +1,12 @@
 # LaunchDarkly Sample Client-Side .NET Applications
 
-We've built a simple demo that demonstrates how LaunchDarkly's SDK works. Since the client-side .NET SDK can be used either on MAUI compatible devices or in portable .NET code, there are two versions of the demo: a MAUI app and a .NET Core console app.
+A simple demo that demonstrates how LaunchDarkly's SDK works. There are two applications in the demo: a MAUI app and a .NET Core console app.
+
+The .NET Maui app. Has 3 screens:
+- A Home screen showing the state of the 2 flags in use. Updating the flags in LaunchDarkly will demonstrate the immediate nature of the flagging update pattern.
+- A login page to switch user context when demonstrating Targeting and Segmenting. The current context is shown on the Home page.
+- A reservation page that can switch office context when demostrating Targeting and Segmenting but something other than the default context (user). When the flag is `available` on this page, conference rooms are shown and when `unavailable` the rooms are not shown.s
+
 
 Important: these demos are for the _client-side_ .NET SDK, which is suitable for mobile or desktop applications. For server-side use, see https://github.com/launchdarkly/hello-dotnet-server.
 
