@@ -7,7 +7,8 @@ The .NET Maui app. Has 3 screens:
 - A login page to switch user context when demonstrating Targeting and Segmenting. The current context is shown on the Home page.
 - A reservation page that can switch office context when demostrating Targeting and Segmenting but something other than the default context (user). When the flag is `available` on this page, conference rooms are shown and when `unavailable` the rooms are not shown.s
 
-
+![iOS](maui-ios.png?raw=true | height=300)
+![Android](maui-android.png?raw=true | height=300)
 
 Important: these demos are for the _client-side_ .NET SDK, which is suitable for mobile or desktop applications. For server-side use, see https://github.com/launchdarkly/hello-dotnet-server.
 
@@ -138,19 +139,6 @@ When the app launches, you should see:
   - Select an office location
   - Reserve desks or conference rooms (if the hoteling feature flag is enabled)
   - View and manage your reservations
-
-### Screenshots
-
-<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-  <div style="text-align: center;">
-    <img src="maui-ios.png" alt="ReservationsDotnetMaui iOS" height="300" />
-    <p><strong>iOS</strong></p>
-  </div>
-  <div style="text-align: center;">
-    <img src="maui-android.png" alt="ReservationsDotnetMaui Android" height="300" />
-    <p><strong>Android</strong></p>
-  </div>
-</div>
 
 ### Live Flag Updates
 
