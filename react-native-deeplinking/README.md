@@ -21,14 +21,20 @@ A React Native app built with Expo for buying ski lift tickets. Works on both An
 
 2. Start the app
 
+   **For Deep Linking Support (Required):**
+   ```bash
+   npx expo run:ios    # iOS - builds a development build
+   npx expo run:android # Android - builds a development build
+   ```
+   
+   **Note:** Deep linking with `darkly://` URLs requires a development build. Expo Go does NOT support custom URL schemes. If you use `npx expo start` and press `i` or `a`, you'll be using Expo Go which won't handle `darkly://` URLs.
+
+   **For Quick Testing (No Deep Linking):**
    ```bash
    npx expo start
    ```
-
-3. Run on your device
-
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
+   - Press `i` for iOS simulator (Expo Go)
+   - Press `a` for Android emulator (Expo Go)
    - Scan QR code with Expo Go app on your physical device
 
 ## App Structure
@@ -87,6 +93,8 @@ Allows users to:
 ## Deep Linking
 
 The app supports deep linking to set the LaunchDarkly user context dynamically.
+
+**⚠️ Important:** Deep linking requires a **development build** (built with `npx expo run:ios` or `npx expo run:android`). Expo Go does NOT support custom URL schemes like `darkly://`. If you see "Can open darkly:// URLs: false" in your logs, you're using Expo Go and need to rebuild.
 
 ### URL Scheme: `darkly://`
 
