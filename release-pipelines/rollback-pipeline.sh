@@ -27,6 +27,14 @@ print_info() {
     echo "${YELLOW}ℹ $1${NC}"
 }
 
+# Load environment variables from .env file if it exists
+if [[ -f ".env" ]]; then
+    # Source .env file, exporting variables
+    set -a
+    source .env 2>/dev/null || true
+    set +a
+fi
+
 # Function to show usage
 usage() {
     cat << EOF
@@ -34,13 +42,13 @@ Usage: $0 --flag-key <flag-key> --api-key <api-key> [--project-key <project-key>
 
 Rollback a release pipeline by turning off flags in all environments except dev.
 
-Required:
-  --flag-key <key>      The feature flag key to rollback
-  --api-key <key>       Your LaunchDarkly API access token
+Required (can be set via .env file or command line):
+  --flag-key <key>      The feature flag key to rollback (or set LAUNCHDARKLY_FLAG_KEY in .env)
+  --api-key <key>       Your LaunchDarkly API access token (or set LAUNCHDARKLY_API_KEY in .env)
 
 Optional:
-  --project-key <key>   The LaunchDarkly project key (default: reads from utils.js)
-  --base-url <url>      LaunchDarkly API base URL (default: https://app.launchdarkly.com/api/v2)
+  --project-key <key>   The LaunchDarkly project key (or set LAUNCHDARKLY_PROJECT_KEY in .env)
+  --base-url <url>      LaunchDarkly API base URL (or set LAUNCHDARKLY_BASE_URL in .env, default: https://app.launchdarkly.com/api/v2)
   --dry-run             Show what would be done without making changes
   --verbose, -v         Print URLs being called for debugging
   --help                Show this help message
@@ -51,11 +59,17 @@ EOF
     exit 1
 }
 
-# Parse command line arguments
-FLAG_KEY=""
-API_KEY=""
-PROJECT_KEY=""
-BASE_URL="https://app.launchdarkly.com/api/v2"
+# Default values from .env (can be overridden by command line)
+DEFAULT_API_KEY="${LAUNCHDARKLY_API_KEY:-}"
+DEFAULT_PROJECT_KEY="${LAUNCHDARKLY_PROJECT_KEY:-}"
+DEFAULT_FLAG_KEY="${LAUNCHDARKLY_FLAG_KEY:-}"
+DEFAULT_BASE_URL="${LAUNCHDARKLY_BASE_URL:-https://app.launchdarkly.com/api/v2}"
+
+# Parse command line arguments (defaults from .env if not provided)
+FLAG_KEY="${DEFAULT_FLAG_KEY}"
+API_KEY="${DEFAULT_API_KEY}"
+PROJECT_KEY="${DEFAULT_PROJECT_KEY}"
+BASE_URL="${DEFAULT_BASE_URL}"
 DRY_RUN=false
 VERBOSE=false
 
