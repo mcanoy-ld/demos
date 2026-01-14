@@ -3,5 +3,6 @@ typescript/.yarn.lock
 .DS_Store
 *.zip
 .vscode/
+data-saving-mode/
 
 
