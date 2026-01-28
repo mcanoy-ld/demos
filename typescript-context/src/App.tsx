@@ -121,8 +121,8 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
             {/* Right Panel - Flag Results */}
             <div className="panel">
               <h3>Flag Results</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', textAlign: 'left', fontFamily: 'monospace' }}>
                     key: release-widget-one
                   </div>
@@ -130,7 +130,7 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
                     {releaseWidgetOne ? '✓ Widget Flag ON' : '✗ Widget Flag OFF'}
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', textAlign: 'left', fontFamily: 'monospace' }}>
                     key: so-cal
                   </div>
