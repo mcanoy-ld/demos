@@ -5,7 +5,7 @@ import { useFlags, useLDClient } from 'launchdarkly-react-client-sdk';
 import contextsData from './contexts.json';
 import { HamburgerMenu, Pipelines } from './components';
 import { 
-  LaunchDarklyToolbar,
+  useLaunchDarklyToolbar, 
   FlagOverridePlugin, 
   EventInterceptionPlugin 
 } from '@launchdarkly/toolbar';
@@ -30,6 +30,14 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
       ldClient.identify(storedValue);
     }
   }, [storedValue, ldClient]);
+
+  // Initialize LaunchDarkly Toolbar
+  useLaunchDarklyToolbar({
+    flagOverridePlugin,
+    eventInterceptionPlugin,
+    position: "bottom-right",
+    enabled: process.env.NODE_ENV === 'development',
+  });
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
       const selectedKey = event.target.value;
@@ -150,16 +158,6 @@ function App({ flagOverridePlugin, eventInterceptionPlugin }: AppProps) {
         </div>
         {renderModuleContent()}
       </header>
-      {/* LaunchDarkly Toolbar */}
-      {process.env.NODE_ENV === 'development' && (
-        <LaunchDarklyToolbar
-          flagOverridePlugin={flagOverridePlugin}
-          eventInterceptionPlugin={eventInterceptionPlugin}
-          //devServerUrl="http://localhost:3001"
-          projectKey="my-project"
-          position="right"
-        />
-      )}
     </div>
   );
 }
