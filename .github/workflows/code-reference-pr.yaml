@@ -1,0 +1,31 @@
+on: pull_request
+
+jobs:
+  find-flags:
+    runs-on: ubuntu-latest
+    name: Find LaunchDarkly feature flags in diff
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Find flags
+        uses: launchdarkly/find-code-references-in-pull-request@v2
+        id: find-flags
+        with:
+          project-key: mcanoy
+          environment-key: production
+          access-token: ${{ secrets.LD_ACCESS_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+      # Add or remove labels on PRs if any flags have changed
+      - name: Add label
+        if: steps.find-flags.outputs.any-changed == 'true'
+        run: gh pr edit $PR_NUMBER --add-label ld-flags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+      - name: Remove label
+        if: steps.find-flags.outputs.any-changed == 'true'
+        run: gh pr edit $PR_NUMBER --remove-label ld-flags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
