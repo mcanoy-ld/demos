@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Release pipeline — feature-lead-widget</title>
+    <link rel="stylesheet" href="pipeline-demo.css" />
+    <!--
+      CSP (if you use a strict policy): allow LaunchDarkly observability / OTEL
+      connect-src: https://pub.observability.app.launchdarkly.com https://otel.observability.app.launchdarkly.com
+      worker-src: data: blob:
+    -->
+  </head>
+  <body>
+    <div class="pipeline-demo-page">
+      <header class="pipeline-demo-header">
+        <h1>LaunchDarkly Release Assistant (pipelines)</h1>
+        <p>
+          Each <strong>user</strong> gets one card per <strong>environment</strong> representing a connection to the launchdarkly environment
+          environment and sends the context to the launchdarkly environment.
+        </p>
+        <span class="pipeline-demo-flag">Flag: feature-lead-widget</span>
+      </header>
+
+      <div class="pipeline-demo-toolbar" aria-label="Production context load generator">
+        <button type="button" id="prod-spam-toggle" class="pipeline-demo-toolbar__btn">
+          Start random contexts → production (10/sec)
+        </button>
+        <span class="pipeline-demo-toolbar__meta">
+          Requests sent: <strong id="prod-spam-count">0</strong>
+        </span>
+        <button
+          type="button"
+          id="prod-spam-beta-toggle"
+          class="pipeline-demo-toolbar__btn pipeline-demo-toolbar__btn--beta"
+        >
+          Start beta-only contexts → production (10/sec)
+        </button>
+        <span class="pipeline-demo-toolbar__meta">
+          Beta-only requests: <strong id="prod-spam-beta-count">0</strong>
+        </span>
+      </div>
+
+      <section
+        id="pipeline-demo-clientids"
+        class="pipeline-demo-clientids"
+        aria-label="Client-side IDs per environment"
+      ></section>
+
+      <div id="pipeline-demo-error" role="alert"></div>
+
+      <div id="pipeline-demo-boxes" class="pipeline-demo-matrix"></div>
+
+      <footer class="pipeline-demo-footer">
+        Run <code>npm start</code> in this folder and open <code>http://localhost:3000/</code> (demo is at the site root).
+        Edit <code>context.json</code> or <code>env.json</code> and save — the UI refreshes on poll
+        (every few seconds). Use a local static server so <code>fetch</code> works (not file://).
+        OpenTelemetry metrics/traces go to LaunchDarkly via the observability plugin (see
+        <code>observability</code> in <code>env.json</code>); requires LaunchDarkly Observability on your account.
+      </footer>
+    </div>
+
+    <script type="module" src="pipeline-demo.js"></script>
+  </body>
+</html>

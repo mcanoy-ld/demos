@@ -49,6 +49,21 @@ A plain JavaScript application that displays a 10x10 grid of 100 users, with eac
 
 ---
 
+### [release-assistant](./release-assistant/)
+**Release Assistant — Pipeline matrix + CLI helpers**
+
+A static browser demo for **release pipelines**: a user × environment matrix driven by `context.json` and `env.json`, evaluating a single flag (`feature-lead-widget`) with optional **LaunchDarkly Observability** (OpenTelemetry). Includes production traffic generators and shell scripts for segments, flag targeting, and canceling an active release.
+
+**Key Features:**
+- One LaunchDarkly client per user × environment with real-time updates
+- Optional OTLP export to LaunchDarkly Observability (configure `observability` in `env.json`)
+- Client-side ID editor with masked display and browser `localStorage` overrides
+- Helper scripts: segment copy, clear flag targeting, cancel release pipeline
+
+**Run:** `npm start` in [release-assistant](./release-assistant/) and open [http://localhost:3000/](http://localhost:3000/) (demo at site root). See [release-assistant/README.md](./release-assistant/README.md) for configuration and script details.
+
+---
+
 ### [react-native-deeplinking](./react-native-deeplinking/)
 **React Native Ski Ticket App with Deep Linking**
 
