@@ -1,0 +1,44 @@
+{
+  "contexts": [
+    {
+      "key": "alex",
+      "name": "Alex",
+      "access_group": "dev"
+    },
+    {
+      "key": "blake",
+      "name": "Blake",
+      "access_group": "qa"
+    },
+    {
+      "key": "kevin",
+      "name": "Kevin",
+      "access_group": "beta"
+    },
+    {
+      "key": "erin",
+      "name": "Erin",
+      "access_group": "beta"
+    },
+    {
+      "key": "roisin",
+      "name": "Roisin",
+      "access_group": "general"
+    },
+    {
+      "key": "ian",
+      "name": "Ian",
+      "access_group": "general"
+    },
+    {
+      "key": "george",
+      "name": "George",
+      "access_group": "general"
+    },
+    {
+      "key": "evelyn",
+      "name": "Evelyn",
+      "access_group": "general"
+    }
+  ]
+}

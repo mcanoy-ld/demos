@@ -4,5 +4,6 @@ typescript/.yarn.lock
 *.zip
 .vscode/
 data-saving-mode/
+release-assistant/env.json
 
 
