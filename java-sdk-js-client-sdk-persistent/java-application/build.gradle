@@ -10,7 +10,7 @@ description = 'Spring Boot app with LaunchDarkly SDK and Redis persistence'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -46,4 +46,6 @@ tasks.named('bootRun') {
 	jvmArgs = [
 		'-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
 	]
+	// Optional external config (overrides src/main/resources/application.properties)
+	systemProperty 'spring.config.additional-location', 'optional:file:./local-config/'
 }

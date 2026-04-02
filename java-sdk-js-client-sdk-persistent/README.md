@@ -36,6 +36,6 @@ A swagger-ui is available at /swagger-ui/index.html. The `/api/boostrap` url is 
 
 ## JavaScript Application
 
-The JavaScript application bootstraps data from the Java application which must be running (of course). The app will show the bootstrapped data and the value of the `widget-one` flag. This value can be changed in the `index.html` to a flag value that exists in your project. 
+The JavaScript application bootstraps data from the Java application which must be running (of course). The app will show the bootstrapped data and the value of the `widget-one` flag. Change `flagKey` in `js-application/config.js` to a flag that exists in your project.
 
-The client side id can be added in the `index.html`. The application will still read from bootstrap with a valid client side id. Updates to the running app will come from LaunchDarkly when properly configured. A refreshed page will bootstrap again form the Java application.
+Set the client-side ID in `js-application/config.js`. The application still uses bootstrap data with a valid client-side ID. Updates to the running app will come from LaunchDarkly when properly configured. A refreshed page will bootstrap again from the Java application.

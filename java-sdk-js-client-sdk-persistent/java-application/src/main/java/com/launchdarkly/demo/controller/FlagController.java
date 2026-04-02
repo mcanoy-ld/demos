@@ -43,7 +43,8 @@ public class FlagController {
     @Operation(
         summary = "Evaluate a feature flag",
         description = "Evaluates a LaunchDarkly feature flag for the provided user context. " +
-                     "The flag key is provided as a URL parameter and the user context is provided in the request body."
+                     "Body JSON: key (required for identity), name (optional), tier (optional) and other custom attributes " +
+                     "are set on the user context for targeting."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -79,10 +80,15 @@ public class FlagController {
         }
 
         try {
-            // Build LDContext from the provided context data
+            // Build LDContext from the provided context data (user kind: key, name, optional tier, etc.)
             String contextKey = contextData.getOrDefault("key", "anonymous").toString();
             String contextName = contextData.getOrDefault("name", "???").toString();
-            LDContext context = LDContext.builder(contextKey).name(contextName).build();
+            ContextBuilder contextBuilder = LDContext.builder(contextKey).name(contextName);
+            Object tier = contextData.get("tier");
+            if (tier != null) {
+                contextBuilder.set("tier", String.valueOf(tier));
+            }
+            LDContext context = contextBuilder.build();
             
             // Evaluate the flag
             boolean flagValue = ldClient.boolVariation(flagKey, context, false);

@@ -23,32 +23,26 @@ This JavaScript application demonstrates using the LaunchDarkly JS SDK (client-s
    npm install
    ```
 
-2. **Update the client-side SDK key:**
+2. **Update configuration:**
    
-   Edit `index.html` and replace the `CLIENT_SIDE_ID` constant with your actual LaunchDarkly client-side SDK key:
+   Edit `config.js` (loaded before `app.js`) and set `clientSideId` to your LaunchDarkly client-side ID. You can also change `bootstrapApiUrl`, `flagKey`, and `context` there:
    ```javascript
-   const CLIENT_SIDE_ID = 'your-actual-client-side-id';
+   window.APP_CONFIG = {
+     bootstrapApiUrl: 'http://localhost:8080/api/bootstrap',
+     clientSideId: 'your-actual-client-side-id',
+     flagKey: 'widget-one',
+     context: { key: 'randy-key', name: 'Randy', kind: 'user' },
+   };
    ```
 
-3. **Update the context (optional):**
-   
-   The default context is set in `index.html`. You can modify it if needed:
-   ```javascript
-   context = {
-     key: 'randy-key',
-     name: 'Randy',
-     kind: 'user'
-   }
-   ```
-
-4. **Start the application:**
+3. **Start the application:**
    ```bash
    npm start
    ```
 
    This will start a local HTTP server on port 3333.
 
-5. **Open in browser:**
+4. **Open in browser:**
    Navigate to `http://localhost:3333`
 
 ## Usage
@@ -83,7 +77,9 @@ The application expects the bootstrap API to:
 
 ## File Structure
 
-- `index.html` - Main HTML file with embedded JavaScript
+- `index.html` - Main HTML file
+- `config.js` - Local settings (`window.APP_CONFIG`), loaded before `app.js`
+- `app.js` - Bootstrap fetch and LaunchDarkly client logic
 - `style.css` - CSS stylesheet for the application
 - `package.json` - Node.js dependencies and scripts
 
@@ -97,11 +93,11 @@ The application expects the bootstrap API to:
 **Flag shows as "OFF" or doesn't update**
 - Verify the `widget-one` flag exists in your LaunchDarkly project
 - Check that the bootstrap data includes the flag
-- Ensure the LaunchDarkly client-side SDK key is set correctly in `index.html`
+- Ensure the LaunchDarkly client-side SDK key is set correctly in `config.js`
 - Check browser console for error messages
 
 **SDK initialization fails**
-- Verify your LaunchDarkly client-side SDK key is correct in `index.html`
+- Verify your LaunchDarkly client-side SDK key is correct in `config.js`
 - Check browser console for error messages
 - Ensure the bootstrap data format is correct
 - Note: Even with an invalid SDK key, the bootstrap data should still work (you'll see errors in console but the app will function)

@@ -19,6 +19,10 @@ public class LaunchDarklyConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(LaunchDarklyConfig.class);
 
+    /** LaunchDarkly application metadata (allowed chars: letters, digits, ., -, _) */
+    private static final String LD_APPLICATION_ID = "java-with-redis-demo";
+    private static final String LD_APPLICATION_VERSION = "1.0.0";
+
     @Value("${launchdarkly.sdk.key:}")
     private String sdkKey;
 
@@ -57,6 +61,10 @@ public class LaunchDarklyConfig {
             logger.error("Failed to initialize LaunchDarkly SDK", e);
             logger.error("Application will continue but flag evaluation may fail");
         }
+
+        ldClient.getFlagTracker().addFlagChangeListener(event -> {
+            logger.info("Flag Changed " + event.getKey());
+        });
     }
 
     private boolean isSdkKeyValid() {
@@ -72,6 +80,8 @@ public class LaunchDarklyConfig {
         logger.info("SDK Key: {}...{}", maskSdkKey(sdkKey, 10), maskSdkKey(sdkKey, -4));
         logger.info("Redis URI: {}", redisUri);
         logger.info("SDK is offline: {}", offline);
+        logger.info("LaunchDarkly application id: {} version: {}", LD_APPLICATION_ID, LD_APPLICATION_VERSION);
+        logger.info("LaunchDarkly event private attributes: name, email, phone_number");
     }
 
     private String maskSdkKey(String key, int length) {
@@ -86,10 +96,19 @@ public class LaunchDarklyConfig {
         logger.info("Configuring LaunchDarkly SDK with Redis persistence...");
         return new LDConfig.Builder()
                 .offline(offline)
+                .applicationInfo(
+                        Components.applicationInfo()
+                                .applicationId(LD_APPLICATION_ID)
+                                .applicationVersion(LD_APPLICATION_VERSION)
+                )
                 .logging(Components.logging().level(com.launchdarkly.logging.LDLogLevel.DEBUG))
                 .dataStore(
                         Components.persistentDataStore(Redis.dataStore().uri(URI.create(redisUri)))
                                 .cacheSeconds(0)
+                )
+                .events(
+                        Components.sendEvents()
+                                .privateAttributes("name", "email", "phone_number")
                 )
                 .build();
     }

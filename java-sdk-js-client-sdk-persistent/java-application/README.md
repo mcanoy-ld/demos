@@ -12,7 +12,7 @@ This Spring Boot application demonstrates LaunchDarkly SDK integration with Redi
 
 ## Prerequisites
 
-- Java (Java 24 recommended)
+- Java 25 (or set `languageVersion` in `build.gradle` to your JDK’s major version)
 - Gradle 8.12+ (included via wrapper)
 - Redis server (for persistent feature store)
 - LaunchDarkly account and SDK key
@@ -46,6 +46,8 @@ launchdarkly.sdk.key=your-sdk-key-here
 launchdarkly.offline=false  # Set to true to run in offline mode (uses Redis only)
 redis.uri=redis://localhost:6379  # Redis URI (use redis://:password@host:port for password)
 ```
+
+For local development without editing files under `src/`, copy `local-config/application.properties.example` to `local-config/application.properties` and set values there. `./gradlew bootRun` loads that directory after the classpath config, so properties in `local-config/application.properties` override the defaults. For a runnable JAR, pass `-Dspring.config.additional-location=optional:file:./local-config/` (or set `SPRING_CONFIG_ADDITIONAL_LOCATION`).
 
 ## Running the Application
 

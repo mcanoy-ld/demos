@@ -12,11 +12,26 @@ export LD_OFFLINE_MODE=true
 export REDIS_URI=redis://localhost:6379
 ```
 
+Or copy `local-config/application.properties.example` to `local-config/application.properties` and set values there. That file overrides `src/main/resources/application.properties` when you run `./gradlew bootRun` (it is gitignored).
+
 Or edit `src/main/resources/application.properties` and change:
 ```properties
 launchdarkly.sdk.key=your-sdk-key-here
 redis.uri=redis://localhost:6379
 launchdarkly.offline=false  # Set to true for offline mode, or use LD_OFFLINE_MODE env var
+```
+
+To use a different file or directory, set the env var before `bootRun` (Spring maps it to `spring.config.additional-location`):
+
+```bash
+export SPRING_CONFIG_ADDITIONAL_LOCATION=optional:file:/absolute/path/to/
+./gradlew bootRun
+```
+
+Or pass a Spring Boot argument (note: this adds to default locations unless you also clear them):
+
+```bash
+./gradlew bootRun --args='--spring.config.additional-location=optional:file:/absolute/path/to/'
 ```
 
 ### Step 2: Start Redis (if running locally)
@@ -77,7 +92,7 @@ curl -X POST http://localhost:8080/api/bootstrap \
 
 **Error: "LAUNCHDARKLY_SDK_KEY is not set"**
 - Set the environment variable: `export LAUNCHDARKLY_SDK_KEY="your-sdk-key-here"`
-- Or add it to `src/main/resources/application.properties` as `launchdarkly.sdk.key=your-sdk-key-here`
+- Or add it to `local-config/application.properties` or `src/main/resources/application.properties` as `launchdarkly.sdk.key=your-sdk-key-here`
 
 **Error: "LaunchDarkly SDK not initialized"**
 - Verify your SDK key is correct

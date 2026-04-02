@@ -1,0 +1,8 @@
+# Copy to application.properties in this directory. Loaded after classpath
+# application.properties (see ./gradlew bootRun).
+
+# launchdarkly.sdk.key=your-sdk-key
+# launchdarkly.flag.key=my-flag
+# launchdarkly.offline=true
+# redis.uri=redis://localhost:6379
+# server.port=8080
