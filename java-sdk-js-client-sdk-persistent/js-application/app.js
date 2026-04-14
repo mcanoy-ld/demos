@@ -27,106 +27,195 @@
     return;
   }
 
-  const { bootstrapApiUrl, clientSideId, flagKey, context, application } = cfg;
-  let apiBootstrapData = null;
-  let apiBootstrapClient = null;
+  const { bootstrapApiUrl, clientSideId, flagKey, application } = cfg;
+  const contexts =
+    Array.isArray(cfg.contexts) && cfg.contexts.length > 0
+      ? cfg.contexts
+      : cfg.context
+        ? [cfg.context]
+        : [];
 
-  const flagSectionTitle = document.getElementById('flagSectionTitle');
-  const flagKeyLabel = document.getElementById('flagKeyLabel');
-  if (flagSectionTitle) flagSectionTitle.textContent = flagKey;
-  if (flagKeyLabel) flagKeyLabel.textContent = flagKey + ':';
-
-  const evaluationContextEl = document.getElementById('evaluationContextJson');
-  if (evaluationContextEl) {
-    evaluationContextEl.textContent = JSON.stringify(context, null, 2);
+  if (contexts.length === 0) {
+    console.error('APP_CONFIG must define contexts (array) or a single legacy context object');
+    showConfigSetupRequired(false);
+    return;
   }
 
+  /** User-facing label: multi-context uses user.name; single-kind uses name or key. */
+  function displayName(ctx) {
+    if (!ctx) return 'user';
+    if (ctx.kind === 'multi' && ctx.user && typeof ctx.user.name === 'string' && ctx.user.name.length > 0) {
+      return ctx.user.name;
+    }
+    if (typeof ctx.name === 'string' && ctx.name.length > 0) return ctx.name;
+    if (ctx.kind === 'multi' && ctx.user && typeof ctx.user.key === 'string' && ctx.user.key.length > 0) {
+      return ctx.user.key;
+    }
+    if (typeof ctx.key === 'string' && ctx.key.length > 0) return ctx.key;
+    return 'user';
+  }
+
+  function contextKeyForLabel(ctx) {
+    if (ctx && ctx.kind === 'multi' && ctx.user && ctx.user.key) return ctx.user.key;
+    if (ctx && ctx.key) return ctx.key;
+    return 'no-key';
+  }
+
+  const rows = [];
+
+  const flagSectionTitle = document.getElementById('flagSectionTitle');
+  if (flagSectionTitle) flagSectionTitle.textContent = flagKey;
+
+  const contextsEvaluationList = document.getElementById('contextsEvaluationList');
   const bootstrapJsonEl = document.getElementById('bootstrapJson');
+  const contextWidgetsHost = document.getElementById('contextWidgets');
+
+  if (contextsEvaluationList) {
+    contextsEvaluationList.textContent = '';
+    contexts.forEach(function (ctx, i) {
+      const item = document.createElement('div');
+      item.className = 'context-evaluation-item';
+      const title = document.createElement('div');
+      title.className = 'context-evaluation-title';
+      title.textContent = 'Context ' + (i + 1) + ' — ' + displayName(ctx);
+      const pre = document.createElement('pre');
+      pre.className = 'json-display evaluation-context-json';
+      pre.textContent = JSON.stringify(ctx, null, 2);
+      item.appendChild(title);
+      item.appendChild(pre);
+      contextsEvaluationList.appendChild(item);
+    });
+  }
+
   if (bootstrapJsonEl) {
     bootstrapJsonEl.textContent = 'Loading bootstrap from ' + bootstrapApiUrl + '...';
   }
 
-  async function bootstrapAPI() {
-    try {
-      const response = await fetch(bootstrapApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(context),
+  async function bootstrapOne(context) {
+    const response = await fetch(bootstrapApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(context),
+    });
+
+    if (!response.ok) {
+      const hint = await response.text();
+      throw new Error(
+        'HTTP ' + response.status + ' ' + response.statusText + (hint ? '\n' + hint.slice(0, 500) : '')
+      );
+    }
+
+    return response.json();
+  }
+
+  async function bootstrapAll() {
+    const results = await Promise.all(
+      contexts.map(function (ctx) {
+        return bootstrapOne(ctx).catch(function (err) {
+          console.error('Bootstrap failed for context', ctx, err);
+          return { __bootstrapError: true, message: err && err.message ? err.message : String(err) };
+        });
+      })
+    );
+
+    if (bootstrapJsonEl) {
+      const combined = {};
+      contexts.forEach(function (ctx, i) {
+        const label = (i + 1) + '. ' + displayName(ctx) + ' (' + contextKeyForLabel(ctx) + ')';
+        combined[label] = results[i];
       });
+      bootstrapJsonEl.textContent = JSON.stringify(combined, null, 2);
+    }
 
-      if (!response.ok) {
-        const hint = await response.text();
-        throw new Error(
-          'HTTP ' + response.status + ' ' + response.statusText + (hint ? '\n' + hint.slice(0, 500) : '')
-        );
-      }
+    return results;
+  }
 
-      apiBootstrapData = await response.json();
-      console.log(apiBootstrapData);
+  function buildWidgets() {
+    if (!contextWidgetsHost) return;
+    contextWidgetsHost.textContent = '';
+    rows.length = 0;
 
-      if (bootstrapJsonEl) {
-        bootstrapJsonEl.textContent = JSON.stringify(apiBootstrapData, null, 2);
-      }
-    } catch (err) {
-      apiBootstrapData = {};
-      const message =
-        err && err.message ? err.message : String(err);
-      console.error('Bootstrap fetch failed:', err);
-      if (bootstrapJsonEl) {
-        bootstrapJsonEl.textContent =
-          'Could not load bootstrap from ' +
-          bootstrapApiUrl +
-          '.\n\n' +
-          (message.indexOf('Failed to fetch') !== -1 || message === 'Load failed'
-            ? 'Network error: the server may be down, the URL may be wrong, or the browser blocked the request (e.g. CORS).'
-            : message);
-      }
+    contexts.forEach(function (ctx) {
+      const wrap = document.createElement('div');
+      wrap.className = 'context-widget';
+
+      const circle = document.createElement('div');
+      circle.className = 'widget-circle off';
+      circle.setAttribute('aria-label', displayName(ctx) + ', ' + flagKey + ' is false');
+      circle.textContent = displayName(ctx);
+
+      wrap.appendChild(circle);
+      contextWidgetsHost.appendChild(wrap);
+
+      rows.push({
+        context: ctx,
+        bootstrap: {},
+        client: null,
+        circle: circle,
+      });
+    });
+  }
+
+  function updateRow(i) {
+    const row = rows[i];
+    if (!row || !row.client) return;
+
+    const flagValue = row.client.variation(flagKey, false);
+    if (row.circle) {
+      row.circle.className = 'widget-circle ' + (flagValue === true ? 'on' : 'off');
+      row.circle.setAttribute(
+        'aria-label',
+        displayName(contexts[i]) + ', ' + flagKey + ' is ' + String(flagValue)
+      );
     }
   }
 
-  function updateWidget() {
-    if (!apiBootstrapClient) return;
+  buildWidgets();
 
-    const flagValue = apiBootstrapClient.variation(flagKey, false);
-    const widgetCircle = document.getElementById('widgetCircle');
-    const widgetValue = document.getElementById('widgetValue');
+  (async function () {
+    const bootstrapResults = await bootstrapAll();
 
-    if (flagValue === true) {
-      widgetCircle.className = 'widget-circle on';
-      widgetCircle.textContent = 'ON';
-      widgetValue.textContent = 'true';
-    } else {
-      widgetCircle.className = 'widget-circle off';
-      widgetCircle.textContent = 'OFF';
-      widgetValue.textContent = 'false';
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].bootstrap = bootstrapResults[i] || {};
     }
-  }
 
-  (async () => {
-    await bootstrapAPI();
+    const appMeta = application || { id: 'js-with-bootstrap', version: 'v1.0.0' };
 
-    // initialize the SDK with the bootstrap data and app metadata (LaunchDarkly Applications / analytics)
-    apiBootstrapClient = LDClient.initialize(clientSideId, context, {
-      bootstrap: apiBootstrapData,
-      application: application || { id: 'js-with-bootstrap', version: 'v1.0.0' },
-      privateAttributes: ['email', 'name'],
-    });
+    for (let i = 0; i < rows.length; i++) {
+      const ctx = contexts[i];
+      const data = rows[i].bootstrap;
+      const payload = data && data.__bootstrapError ? {} : data;
 
-    apiBootstrapClient.on('ready', () => {
-      console.log('API Bootstrapped SDK ready');
-      updateWidget();
-    });
+      const client = LDClient.initialize(clientSideId, ctx, {
+        bootstrap: payload,
+        application: appMeta,
+        privateAttributes: ['name'],
+      });
+      rows[i].client = client;
 
-    apiBootstrapClient.on('change', () => {
-      console.log('API Bootstrapped SDK updated');
-      updateWidget();
-    });
+      (function (index) {
+        client.on('ready', function () {
+          console.log('API Bootstrapped SDK ready for', displayName(contexts[index]));
+          updateRow(index);
+        });
 
-    apiBootstrapClient.on('change:' + flagKey, () => {
-      console.log('Flag changed:', flagKey);
-      updateWidget();
-    });
-  })();
+        client.on('change', function () {
+          updateRow(index);
+        });
+
+        client.on('change:' + flagKey, function () {
+          console.log('Flag changed:', flagKey, displayName(contexts[index]));
+          updateRow(index);
+        });
+      })(i);
+    }
+  })().catch(function (err) {
+    console.error(err);
+    if (bootstrapJsonEl) {
+      bootstrapJsonEl.textContent =
+        'Bootstrap step failed.\n\n' + (err && err.message ? err.message : String(err));
+    }
+  });
 })();

@@ -6,7 +6,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   min-height: 100vh;
   padding: 20px;
   color: #333;
@@ -22,7 +22,7 @@ body {
 }
 
 h1 {
-  color: #667eea;
+  color: #0f766e;
   margin-bottom: 30px;
   text-align: center;
   font-size: 2em;
@@ -43,10 +43,10 @@ h1 {
 }
 
 .box h2 {
-  color: #667eea;
+  color: #0f766e;
   margin-bottom: 15px;
   font-size: 1.3em;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #0f766e;
   padding-bottom: 10px;
 }
 
@@ -70,6 +70,61 @@ h1 {
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.context-widgets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  padding: 16px 8px 8px;
+}
+
+.context-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  max-width: 160px;
+}
+
+.context-widget .widget-circle {
+  width: 112px;
+  height: 112px;
+  font-size: clamp(14px, 3.5vw, 20px);
+  text-align: center;
+  padding: 8px;
+  line-height: 1.15;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.contexts-evaluation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.context-evaluation-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.context-evaluation-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0f766e;
+  padding: 8px 12px;
+  background: #ccfbf1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.context-evaluation-item .json-display {
+  max-height: 200px;
+  margin: 0;
+  border-radius: 0;
 }
 
 .widget-circle {
@@ -99,12 +154,12 @@ h1 {
 .widget-label {
   font-size: 18px;
   font-weight: 600;
-  color: #667eea;
+  color: #0f766e;
   margin-top: 10px;
 }
 
 .evaluation-context-heading {
-  color: #667eea;
+  color: #0f766e;
   font-size: 0.95em;
   font-weight: 600;
   margin: 20px 0 10px;
@@ -145,7 +200,7 @@ h1 {
 
 .config-setup-hint {
   font-weight: 600;
-  color: #667eea;
+  color: #0f766e;
 }
 
 @media (max-width: 768px) {

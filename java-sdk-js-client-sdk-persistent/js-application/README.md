@@ -2,6 +2,12 @@
 
 This JavaScript application demonstrates using the LaunchDarkly JS SDK (client-side) with bootstrapping data from a server-side API. The application automatically fetches bootstrap data on page load and displays it alongside a visual flag indicator.
 
+## Important: this demo is not a best-practices reference
+
+**LaunchDarkly recommends a single LaunchDarkly client instance per application.** One client keeps behavior predictable, avoids duplicate connections and event handling, and matches how we expect you to integrate the SDK in production.
+
+**This demo intentionally uses multiple client instances** so you can see how changes made in the LaunchDarkly UI propagate into the app and how **targeting** (rules, segments, individual contexts) affects **different users** side by side. That teaching goal conflicts with the one-client guideline—do not copy that pattern into a real app. In production, use one client (or one client per logical app surface, as your architecture requires) and switch context with `identify` (or equivalent) instead of spinning up many clients for different users on the same page.
+
 ## Features
 
 - **Automatic Bootstrap Integration**: Automatically fetches flag data from the Java backend API (`/api/bootstrap`) on page load
