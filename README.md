@@ -127,6 +127,11 @@ A .NET MAUI (Multi-platform App UI) application demonstrating LaunchDarkly's cli
 - **MAUI App**: Full-featured mobile/desktop application (`ReservationsDotnetMaui`)
 - **Console App**: Simple command-line demo (`DotNetConsoleApp`) for testing SDK integration without mobile development tools
 
+### [flutter/flutterapp](./flutter/flutterapp/)
+**Flutter port of the MAUI Office Reservations app**
+
+Same LaunchDarkly client patterns, flags (`hello-maui`, `enabled-office-conf-room-hoteling`), login, home dashboard with streaming flag updates, and desk / conference room hoteling with user + office multi-context. See that folder’s `README.md` for `flutter run` and `--dart-define=LAUNCHDARKLY_MOBILE_KEY`.
+
 ---
 
 ### [dotnet-server](./dotnet-server/)
