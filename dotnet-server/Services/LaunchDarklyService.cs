@@ -1,24 +1,33 @@
-
-
 using LaunchDarkly.Sdk;
 using LaunchDarkly.Sdk.Server;
+using LaunchDarkly.Sdk.Server.Interfaces;
 using LaunchDarkly.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace MyApp.Namespace
 {
-    public class LaunchDarklyService{
-        public static LdClient CreateLdClient( string sdkKey){
-                
-
+    public class LaunchDarklyService
+    {
+        public static LdClient CreateLdClient(string sdkKey, ILogger logger)
+        {
             if (string.IsNullOrEmpty(sdkKey))
             {
-                Console.WriteLine("*** Please set LAUNCHDARKLY_SDK_KEY environment variable to your LaunchDarkly SDK key first\n");
+                logger.LogCritical(
+                    "LaunchDarkly SDK key is not set. Set LaunchDarkly:SdkKey in configuration or LAUNCHDARKLY_SDK_KEY.");
                 Environment.Exit(1);
             }
             var ldConfig = Configuration.Builder(sdkKey)
+                            .ApplicationInfo(Components.ApplicationInfo()
+                                .ApplicationId("dotnet-server-demo")
+                                .ApplicationName("dotnet-server-demo")
+                                .ApplicationVersion("1.0.0")
+                                .ApplicationVersionName("v1")
+                            )
                             .Events(
-                                    Components.SendEvents().FlushInterval(TimeSpan.FromSeconds(5)).Capacity(50000)
-                                    
+                                    Components.SendEvents()
+                                        .FlushInterval(TimeSpan.FromSeconds(5))
+                                        .Capacity(50000)
+                                        .PrivateAttributes("name", "phone_number")
                                 )
                             
                             .StartWaitTime(TimeSpan.FromSeconds(5))
@@ -37,13 +46,19 @@ namespace MyApp.Namespace
             
             if (ldClient.Initialized)
             {
-                Console.WriteLine("*** SDK successfully initialized!\n");
+                logger.LogInformation("LaunchDarkly SDK successfully initialized");
+                ldClient.FlagTracker.FlagChanged += (_, e) =>
+                {
+                    logger.LogInformation(
+                        "LaunchDarkly flag change: configuration updated for flag key {FlagKey}",
+                        e.Key);
+                };
             }
             else
             {
-                Console.WriteLine("*** SDK failed to initialize\n");
-                
-            }     
+                logger.LogError("LaunchDarkly SDK failed to initialize");
+            }
+
             return ldClient;    
         }
     }

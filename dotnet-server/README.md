@@ -74,28 +74,28 @@ Or navigate to: `http://localhost:5263/swagger/index.html` in your browser.
 ```
 GET /api/FeatureFlag/all
 ```
-Returns the state of all feature flags for the default context (user key: "example-user-key", name: "Sandy").
+Returns the state of all feature flags for the default demo user. Evaluation uses a **multi-context**: kind `user` (key from profile, attributes: name, email, phone_number, address) and kind `office` (key derived from office label, attribute `location` = profile office name).
 
 ### Evaluate a Specific Flag
 ```
-GET /api/FeatureFlag/{flagKey}?key={userKey}&name={userName}
+GET /api/FeatureFlag/{flagKey}?contextKey={contextKey}
 ```
-Evaluates a specific feature flag for a given user context.
+Evaluates a specific feature flag for a demo user resolved by `contextKey` from static profiles (`Models/DemoUserProfile.cs`).
 
 **Parameters:**
 - `flagKey` (path): The key of the feature flag to evaluate
-- `key` (query, optional): User key (default: "example-user-key")
-- `name` (query, optional): User name (default: "Sandy")
+- `contextKey` (query, optional): Selects the demo **user** context key (`user` kind). Same multi-context rules as above: **office** is a separate context with `location`. Known keys: `user-sandy-key`, `user-alex-key`, `user-morgan-key`, `user-ian-key`, `user-george-key`, `user-noone-key` (default: `user-sandy-key`). Unknown keys still use **Noone**’s profile for both user and office contexts.
 
 **Example:**
 ```bash
-curl "http://localhost:5263/api/FeatureFlag/my-flag-key?key=user123&name=John"
+curl "http://localhost:5263/api/FeatureFlag/my-flag-key?contextKey=user-alex-key"
 ```
 
 ## Project Structure
 
 - `Program.cs` - Application entry point and service configuration
 - `Controllers/FeatureFlagController.cs` - API endpoints for flag evaluation
+- `Models/DemoUserProfile.cs` - Demo `contextKey` → static user attributes for LaunchDarkly contexts
 - `Services/LaunchDarklyService.cs` - LaunchDarkly SDK client initialization
 - `appsettings.json` - Configuration file (can include SDK key)
 
