@@ -11,11 +11,25 @@
       <div class="content-grid">
         <div class="box">
           <h2>LaunchDarkly Bootstrapped from API</h2>
-          <div id="bootstrapJson" class="json-display"></div>
+          <div id="bootstrapResultsList" class="contexts-evaluation-list" aria-label="Bootstrap payload per context"></div>
         </div>
         
         <div class="box">
-          <h2 id="flagSectionTitle"></h2>
+          <h2 class="flag-section-heading">
+            <button
+              type="button"
+              id="flagKeyDisplay"
+              class="flag-key-display"
+              title="Click to change flag key"
+              aria-expanded="false"
+              aria-controls="flagKeyForm"
+            ></button>
+            <form id="flagKeyForm" class="flag-key-form" hidden>
+              <input type="text" id="flagKeyInput" class="flag-key-input" autocomplete="off" spellcheck="false" aria-label="Flag key" />
+              <button type="submit" class="flag-key-btn flag-key-btn-primary">Save</button>
+              <button type="button" id="flagKeyCancel" class="flag-key-btn">Cancel</button>
+            </form>
+          </h2>
           <div id="contextWidgets" class="context-widgets" aria-label="Flag state per user context"></div>
           <h3 class="evaluation-context-heading">Contexts sent for evaluation</h3>
           <div id="contextsEvaluationList" class="contexts-evaluation-list"></div>
@@ -23,6 +37,7 @@
       </div>
     </div>
 
+    <script src="demo_contexts.js"></script>
     <script src="config.js" onerror="window.__configJsLoadFailed = true"></script>
     <script src="app.js"></script>
   </body>
