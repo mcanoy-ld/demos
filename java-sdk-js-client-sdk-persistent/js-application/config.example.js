@@ -5,7 +5,7 @@
  */
 window.APP_CONFIG = {
   bootstrapApiUrl: 'http://localhost:8080/api/bootstrap',
-  clientSideId: 'LD_CLIENT_ID',
+  clientSideId: 'LD_CLIENT_KEY',
   flagKey: 'LD_FLAG_KEY',
   contexts: window.DEMO_CONTEXTS,
   application: {
