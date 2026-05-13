@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 JS_APP="${ROOT}/js-application"
 
 : "${LD_CLIENT_KEY:?Set LD_CLIENT_KEY (LaunchDarkly client-side ID)}"
-LD_FLAG_KEY="${LD_FLAG_KEY:-widget-one}"
+LD_FLAG_KEY="${LD_FLAG_KEY:-enable-site-redesign}"
 
 export LD_CLIENT_KEY LD_FLAG_KEY JS_APP
 python3 <<'PY'

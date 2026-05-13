@@ -8,12 +8,28 @@
     <div class="wrapper">
       <h1>LaunchDarkly Bootstrap Demo</h1>
       
-      <div class="content-grid">
-        <div class="box">
-          <h2>LaunchDarkly Bootstrapped from API</h2>
-          <div id="bootstrapResultsList" class="contexts-evaluation-list" aria-label="Bootstrap payload per context"></div>
+      <div id="contentGrid" class="content-grid">
+        <div class="bootstrap-grid-cell">
+          <div class="bootstrap-panel-toggle-wrap">
+            <label class="bootstrap-toggle">
+              <input
+                type="checkbox"
+                id="showBootstrapInfo"
+                aria-controls="bootstrapPanel"
+              />
+              Show bootstrap info
+            </label>
+          </div>
+          <div id="bootstrapPanel" class="box bootstrap-panel-box" hidden>
+            <h2>LaunchDarkly Bootstrapped from API</h2>
+            <div
+              id="bootstrapResultsList"
+              class="contexts-evaluation-list"
+              aria-label="Bootstrap payload per context"
+            ></div>
+          </div>
         </div>
-        
+
         <div class="box">
           <h2 class="flag-section-heading">
             <button

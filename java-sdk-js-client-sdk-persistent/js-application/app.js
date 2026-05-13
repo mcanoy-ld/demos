@@ -173,8 +173,51 @@
   }
 
   const contextsEvaluationList = document.getElementById('contextsEvaluationList');
+  const contentGrid = document.getElementById('contentGrid');
+  const bootstrapPanel = document.getElementById('bootstrapPanel');
   const bootstrapResultsList = document.getElementById('bootstrapResultsList');
+  const showBootstrapInfo = document.getElementById('showBootstrapInfo');
   const contextWidgetsHost = document.getElementById('contextWidgets');
+
+  const BOOTSTRAP_INFO_VISIBILITY_KEY = 'ld-bootstrap-demo-show-bootstrap-info';
+
+  function loadShowBootstrapInfo() {
+    try {
+      const v = sessionStorage.getItem(BOOTSTRAP_INFO_VISIBILITY_KEY);
+      if (v === 'true' || v === '1') return true;
+      if (v === 'false' || v === '0') return false;
+    } catch (e) {
+      /* private mode */
+    }
+    return false;
+  }
+
+  function applyShowBootstrapInfo(show) {
+    if (!bootstrapPanel) return;
+    bootstrapPanel.hidden = !show;
+    if (contentGrid) {
+      contentGrid.classList.toggle('content-grid--bootstrap-panel-hidden', !show);
+    }
+    if (showBootstrapInfo) {
+      showBootstrapInfo.checked = show;
+    }
+  }
+
+  function persistShowBootstrapInfo(show) {
+    try {
+      sessionStorage.setItem(BOOTSTRAP_INFO_VISIBILITY_KEY, show ? 'true' : 'false');
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  if (showBootstrapInfo && bootstrapPanel) {
+    applyShowBootstrapInfo(loadShowBootstrapInfo());
+    showBootstrapInfo.addEventListener('change', function () {
+      applyShowBootstrapInfo(showBootstrapInfo.checked);
+      persistShowBootstrapInfo(showBootstrapInfo.checked);
+    });
+  }
 
   function bootstrapPanelTitle(ctx) {
     return 'Bootstrapping client for ' + displayName(ctx);

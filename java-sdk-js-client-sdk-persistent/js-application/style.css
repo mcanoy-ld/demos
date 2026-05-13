@@ -35,6 +35,22 @@ h1 {
   margin-top: 20px;
 }
 
+.content-grid.content-grid--bootstrap-panel-hidden {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.content-grid.content-grid--bootstrap-panel-hidden > .bootstrap-grid-cell {
+  width: 100%;
+  max-width: 680px;
+  align-items: center;
+}
+
+.content-grid.content-grid--bootstrap-panel-hidden > .box {
+  width: 100%;
+  max-width: 680px;
+}
+
 .box {
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -48,6 +64,39 @@ h1 {
   font-size: 1.3em;
   border-bottom: 2px solid #0f766e;
   padding-bottom: 10px;
+}
+
+.bootstrap-grid-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.bootstrap-panel-toggle-wrap {
+  padding: 2px 0;
+}
+
+.bootstrap-toggle {
+  font-size: 0.95em;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.bootstrap-toggle input {
+  cursor: pointer;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.bootstrap-panel-box[hidden] {
+  display: none !important;
 }
 
 .flag-section-heading {
